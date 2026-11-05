@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Ingreso - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · SOLICITUD DE INGRESO</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="../index.html">
+            <i class="fas fa-arrow-left"></i> Volver al Login
+        </a>
+    </div>
+</nav>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white text-center py-3">
+                    <h4 class="mb-0" style="color: var(--azul-oscuro);">
+                        <i class="fas fa-user-plus me-2"></i> Solicitar Acceso
+                    </h4>
+                    <small class="text-muted">Llena tus datos y el administrador revisará tu solicitud.</small>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div id="mensaje" class="alert d-none" role="alert"></div>
+
+                    <form id="formSolicitud">
+                        <!-- Datos personales -->
+                        <div class="mb-3">
+                            <label class="form-label">Nombre completo *</label>
+                            <input type="text" class="form-control" id="nombre" required placeholder="Ej: Juan Pérez García">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Correo electrónico *</label>
+                                <input type="email" class="form-control" id="email" required placeholder="correo@ejemplo.com">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Número de cuenta *</label>
+                                <input type="text" class="form-control" id="numCuenta" required placeholder="Ej: 319000123">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Número de celular *</label>
+                            <input type="tel" class="form-control" id="celular" required placeholder="Ej: 5512345678">
+                        </div>
+
+                        <!-- Contraseñas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contraseña *</label>
+                                <input type="password" class="form-control" id="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Repetir contraseña *</label>
+                                <input type="password" class="form-control" id="password2" required minlength="6" placeholder="Confirma tu contraseña">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Selección de materias -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">¿A qué materias solicitas acceso? *</label>
+                            <p class="text-muted small mb-2">Selecciona todas las que estés cursando actualmente.</p>
+                            
+                            <div class="border rounded p-3 bg-light" style="max-height: 250px; overflow-y: auto;" id="listaMaterias">
+                                <div class="text-center text-muted small py-3">
+                                    <i class="fas fa-spinner fa-spin"></i> Cargando materias...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btnEnviar">
+                                <i class="fas fa-paper-plane me-2"></i> Enviar Solicitud
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Plataforma Educativa
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { listarMaterias } from "../js/materias.js";
+    import { crearSolicitud } from "../js/solicitudes.js";
+
+    const form = document.getElementById("formSolicitud");
+    const listaMaterias = document.getElementById("listaMaterias");
+    const btn = document.getElementById("btnEnviar");
+    const divMensaje = document.getElementById("mensaje");
+
+    // 1. Cargar materias disponibles al iniciar
+    async function cargarMaterias() {
+        const res = await listarMaterias();
+        if (!res.ok) {
+            listaMaterias.innerHTML = '<div class="text-danger small">Error al cargar materias.</div>';
+            return;
+        }
+
+        if (res.materias.length === 0) {
+            listaMaterias.innerHTML = '<div class="text-muted small">No hay materias registradas en el sistema.</div>';
+            return;
+        }
+
+        listaMaterias.innerHTML = "";
+        res.materias.forEach((m) => {
+            const div = document.createElement("div");
+            div.className = "form-check mb-2";
+            div.innerHTML = `
+                <input class="form-check-input check-materia" type="checkbox" value="${m.id}" id="mat_${m.id}">
+                <label class="form-check-label" for="mat_${m.id}">
+                    <strong>${m.nombre}</strong>
+                </label>
+            `;
+            listaMaterias.appendChild(div);
+        });
+    }
+
+    cargarMaterias();
+
+    // 2. Enviar el formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        divMensaje.classList.add("d-none");
+
+        const nombre = document.getElementById("nombre").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const numCuenta = document.getElementById("numCuenta").value.trim();
+        const celular = document.getElementById("celular").value.trim();
+        const pass1 = document.getElementById("password").value;
+        const pass2 = document.getElementById("password2").value;
+
+        // Validar contraseñas
+        if (pass1 !== pass2) {
+            mostrarError("Las contraseñas no coinciden.");
+            return;
+        }
+
+        // Obtener materias seleccionadas
+        const materiasSeleccionadas = [];
+        document.querySelectorAll(".check-materia:checked").forEach((chk) => {
+            materiasSeleccionadas.push(chk.value);
+        });
+
+        if (materiasSeleccionadas.length === 0) {
+            mostrarError("Debes seleccionar al menos una materia.");
+            return;
+        }
+
+        // Bloquear botón
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Enviando...';
+
+        // Llamar a la función de Firebase
+        const res = await crearSolicitud({
+            nombre,
+            email,
+            password: pass1,
+            numCuenta,
+            celular,
+            materias: materiasSeleccionadas
+        });
+
+        if (res.ok) {
+            divMensaje.className = "alert alert-success";
+            divMensaje.innerHTML = `
+                <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>¡Solicitud Enviada!</h5>
+                <p class="mb-0">Tu solicitud ha sido enviada al administrador. Te notificaremos cuando sea aprobada para que puedas iniciar sesión.</p>
+            `;
+            divMensaje.classList.remove("d-none");
+            form.reset();
+            window.scrollTo(0, 0);
+        } else {
+            mostrarError(res.error);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Enviar Solicitud';
+    });
+
+    function mostrarError(texto) {
+        divMensaje.className = "alert alert-danger";
+        divMensaje.textContent = texto;
+        divMensaje.classList.remove("d-none");
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>

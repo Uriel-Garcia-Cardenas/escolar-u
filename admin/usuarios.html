@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · GESTIÓN DE USUARIOS</p>
+        </div>
+        <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard-admin.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Formulario: crear usuario -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-plus me-2"></i> Crear nuevo usuario
+        </div>
+        <div class="card-body">
+            <form id="formCrear">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="Juan Pérez" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="email" placeholder="juan@escolar-u.com" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rol</label>
+                        <select class="form-select" id="rol" required>
+                            <option value="">Selecciona un rol...</option>
+                            <option value="admin">Administrador</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="alumno">Alumno</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnCrear">
+                        <i class="fas fa-save me-2"></i> Crear usuario
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+                </div>
+            </form>
+            <div id="mensajeForm" class="mt-3" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Tabla: lista de usuarios -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-users me-2"></i> Usuarios registrados</span>
+            <button class="btn btn-sm btn-outline-primary" id="btnRefrescar">
+                <i class="fas fa-sync-alt"></i> Refrescar
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuarios">
+                        <tr><td colspan="5" class="text-center text-muted py-4">Cargando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Gestión de Usuarios
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { logout } from "../js/auth.js";
+    import {
+        crearUsuario,
+        listarUsuarios,
+        actualizarRol,
+        cambiarActivo,
+        borrarUsuarioDoc
+    } from "../js/usuarios.js";
+
+    protegerPagina("admin", "../");
+
+    // --- Cerrar sesión ---
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // --- Utilidad para mostrar mensajes ---
+    function mostrarForm(texto, tipo) {
+        const msg = document.getElementById("mensajeForm");
+        msg.style.display = "block";
+        msg.className = tipo === "ok" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
+        msg.textContent = texto;
+    }
+
+    // --- Crear usuario ---
+    const formCrear = document.getElementById("formCrear");
+    const btnCrear  = document.getElementById("btnCrear");
+
+    formCrear.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        btnCrear.disabled = true;
+        btnCrear.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creando...';
+
+        const datos = {
+            nombre:   document.getElementById("nombre").value.trim(),
+            email:    document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value,
+            rol:      document.getElementById("rol").value
+        };
+
+        const res = await crearUsuario(datos);
+
+        btnCrear.disabled = false;
+        btnCrear.innerHTML = '<i class="fas fa-save me-2"></i> Crear usuario';
+
+        if (res.ok) {
+            mostrarForm(`✅ Usuario ${datos.email} creado como ${datos.rol}`, "ok");
+            formCrear.reset();
+            cargarUsuarios();
+        } else {
+            mostrarForm(res.error, "error");
+        }
+    });
+
+    // --- Cargar usuarios ---
+    async function cargarUsuarios() {
+        const tbody = document.getElementById("tablaUsuarios");
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Cargando...</td></tr>';
+
+        const res = await listarUsuarios();
+
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${res.error}</td></tr>`;
+            return;
+        }
+
+        if (res.usuarios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No hay usuarios registrados.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        res.usuarios.forEach((u) => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+                <td>${u.nombre || "—"}</td>
+                <td>${u.email || "—"}</td>
+                <td>
+                    <select class="form-select form-select-sm rol-select" data-uid="${u.uid}">
+                        <option value="admin"      ${u.rol === "admin"      ? "selected" : ""}>admin</option>
+                        <option value="supervisor" ${u.rol === "supervisor" ? "selected" : ""}>supervisor</option>
+                        <option value="alumno"     ${u.rol === "alumno"     ? "selected" : ""}>alumno</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input activo-switch" type="checkbox" data-uid="${u.uid}" ${u.activo ? "checked" : ""}>
+                    </div>
+                </td>
+                  <td>
+    <button class="btn btn-sm btn-outline-warning btn-reset me-1" data-email="${u.email}" title="Enviar correo de restablecimiento de contraseña">
+        <i class="fas fa-key"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-danger btn-borrar" data-uid="${u.uid}">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>
+            `;
+            tbody.appendChild(fila);
+        });
+
+        // Listeners de la tabla
+        tbody.querySelectorAll(".rol-select").forEach((sel) => {
+            sel.addEventListener("change", async () => {
+                const uid = sel.dataset.uid;
+                const nuevoRol = sel.value;
+                const r = await actualizarRol(uid, nuevoRol);
+                if (!r.ok) alert(r.error);
+            });
+        });
+
+        tbody.querySelectorAll(".activo-switch").forEach((chk) => {
+            chk.addEventListener("change", async () => {
+                const uid = chk.dataset.uid;
+                const activo = chk.checked;
+                const r = await cambiarActivo(uid, activo);
+                if (!r.ok) alert(r.error);
+            });
+        });
+
+        tbody.querySelectorAll(".btn-borrar").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+                if (!confirm("¿Borrar este usuario de Firestore? (No se borra de Auth)")) return;
+                const uid = btn.dataset.uid;
+                const r = await borrarUsuarioDoc(uid);
+                if (r.ok) cargarUsuarios();
+                else alert(r.error);
+            });
+        });
+
+        tbody.querySelectorAll(".btn-reset").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+        const email = btn.dataset.email;
+        if (!confirm(`¿Enviar correo de restablecimiento de contraseña a ${email}?`)) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const { enviarResetPassword } = await import("../js/usuarios.js");
+        const r = await enviarResetPassword(email);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-key"></i>';
+
+        if (r.ok) {
+            alert(`✅ ${r.mensaje}`);
+        } else {
+            alert(`❌ ${r.error}`);
+        }
+    });
+});
+    }
+
+    document.getElementById("btnRefrescar").addEventListener("click", cargarUsuarios);
+
+    // Cargar al abrir la página
+    cargarUsuarios();
+</script>
+
+</body>
+</html>

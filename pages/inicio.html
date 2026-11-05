@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESCOLAR_U - Plataforma Educativa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+   <header class="site-header">
+    <div class="container">
+        <div class="logo">
+             <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · PLATAFORMA EDUCATIVA</p>
+        </div>
+         <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+                <a class="navbar-brand nav-home-btn" href="dashboard.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <!-- Materias -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="materiasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Materias
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="materiasDropdown">
+                        <li><a class="dropdown-item" href="materia1.html">Informática I</a></li>
+                        <li><a class="dropdown-item" href="materia2.html">Programación Visual</a></li>
+                        <li><a class="dropdown-item" href="materia3.html">Programación Aplicada a la Ingeniería</a></li>
+                        <li><a class="dropdown-item" href="materia4.html">Computación para Ingeniería</a></li>
+                        <li><a class="dropdown-item" href="materia5.html">Seguridad Informática</a></li>
+                        <li><a class="dropdown-item" href="materia6.html">Tópicos Selectos de Informática</a></li>
+                        <li><a class="dropdown-item" href="materia7.html">Comercio Electrónico</a></li>
+                        <li><a class="dropdown-item" href="materia8.html">Análisis de Redes de Datos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#contactoModal">Contacto</a>
+                </li>
+                <!-- Nuevo: Cerrar Sesión -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="cerrarSesionBtn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    <div class="modal fade" id="contactoModal" tabindex="-1" aria-labelledby="contactoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white" style="background-color: var(--azul-oscuro) !important;">
+                    <h5 class="modal-title" id="contactoModalLabel"><i class="fas fa-chalkboard-teacher me-2"></i> Contacto Profesora Liana López</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Información general -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-user-graduate me-2"></i> Profesora</h5>
+                                <p class="mb-0"><strong>LIANA LOPEZ PACHECO</strong></p>
+                                <hr>
+                                <h5><i class="fas fa-envelope me-2"></i> Correo</h5>
+                                <p><a href="mailto:lizli_lopez@hotmail.com">lizli_lopez@hotmail.com</a></p>
+                                <h5><i class="fab fa-facebook me-2"></i> Facebook</h5>
+                                <p><a href="https://facebook.com/prof.liana" target="_blank">@prof.Liana</a></p>
+                                <h5><i class="fas fa-phone me-2"></i> Teléfono</h5>
+                                <p>+52 55 66 78 78 78</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-clock me-2"></i> Horario de Oficina</h5>
+                                <p><strong>Lunes a Viernes:</strong> 16:00 - 18:00 hrs</p>
+                                <p><small class="text-muted">Disponible para dudas y asesorías previa cita.</small></p>
+                                <hr>
+                                <h5><i class="fas fa-calendar-alt me-2"></i> Atención en línea</h5>
+                                <p>Plataforma Teams / Google Meet con cita previa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Horario semanal de materias -->
+                    <h5 class="mt-3 mb-3 text-center"><i class="fas fa-table-list me-2"></i> Horario de Clases (Lunes a Viernes)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Horario</th>
+                                    <th>Materia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Lunes</strong></td>
+                                    <td>10:00 - 12:00</td>
+                                    <td>Informática I</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Martes</strong></td>
+                                    <td>14:00 - 16:00</td>
+                                    <td>Programación Visual</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Miércoles</strong></td>
+                                    <td>10:00 - 12:00</td>
+                                    <td>Informática I</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Jueves</strong></td>
+                                    <td>14:00 - 16:00</td>
+                                    <td>Programación Visual</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Viernes</strong></td>
+                                    <td>08:00 - 10:00</td>
+                                    <td>Programación Aplicada a la Ingeniería</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i> Las demás materias 
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+    <h2 class="text-center mb-4">Materias Disponibles</h2>
+    <div class="row g-4" id="listaMaterias">
+        <div class="col-12 text-center text-muted py-4">Cargando materias...</div>
+    </div>
+</div>
+    <footer class="text-center mt-5">
+        <div class="container p-3">
+            © 2026 ESCOLAR_U - Plataforma Educativa
+        </div>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+   <script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { listarMaterias } from "../js/materias.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+
+    protegerPagina("alumno", "../");
+
+    // --- Cerrar sesión ---
+    const btnSalir = document.getElementById("cerrarSesionBtn");
+    if (btnSalir) {
+        btnSalir.addEventListener("click", async (e) => {
+            e.preventDefault();
+            await logout();
+            window.location.href = "../index.html";
+        });
+    }
+
+    // --- Cargar SOLO las materias asignadas al alumno ---
+    async function cargarMisMaterias(uidAlumno) {
+        const contenedor = document.getElementById("listaMaterias");
+        if (!contenedor) return;
+
+        // 1. Leemos el perfil del alumno para obtener sus materiasAsignadas
+        const resU = await obtenerUsuario(uidAlumno);
+        if (!resU.ok) {
+            contenedor.innerHTML = `<div class="col-12 text-center text-danger py-4">${resU.error}</div>`;
+            return;
+        }
+
+        const asignadas = resU.usuario.materiasAsignadas || [];
+
+        if (asignadas.length === 0) {
+            contenedor.innerHTML = `
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Aún no tienes materias asignadas. Contacta a tu administrador.
+                </div>
+            `;
+            return;
+        }
+
+        // 2. Pedimos todas las materias y filtramos las que están asignadas
+        const resM = await listarMaterias();
+        if (!resM.ok) {
+            contenedor.innerHTML = `<div class="col-12 text-center text-danger py-4">${resM.error}</div>`;
+            return;
+        }
+
+        const misMaterias = resM.materias.filter((m) => asignadas.includes(m.id));
+
+        if (misMaterias.length === 0) {
+            contenedor.innerHTML = '<div class="col-12 text-center text-muted py-4">Tus materias asignadas ya no existen.</div>';
+            return;
+        }
+
+        // 3. Pintar solo las materias del alumno
+        contenedor.innerHTML = "";
+        misMaterias.forEach((m) => {
+            const col = document.createElement("div");
+            col.className = "col-md-6 col-lg-3";
+            col.innerHTML = `
+                <div class="card h-100">
+                    <img src="/${m.imagen || "assets/images/programacion.jpg"}"
+                         class="card-img-top"
+                         alt="${m.nombre}"
+                         onerror="this.src='../assets/images/programacion.jpg'">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${m.nombre}</h5>
+                        <p class="card-text">${m.descripcion || ""}</p>
+                        <a href="materia.html?id=${m.id}" class="btn btn-outline-primary w-100 mt-auto">Ingresar</a>
+                    </div>
+                </div>
+            `;
+            contenedor.appendChild(col);
+        });
+    }
+
+    // --- Al detectar sesión, cargamos ---
+    observarSesion(({ logueado, user }) => {
+        if (logueado) cargarMisMaterias(user.uid);
+    });
+</script>
+</body>
+</html>

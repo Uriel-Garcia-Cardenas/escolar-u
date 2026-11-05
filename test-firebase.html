@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Firebase</title>
+</head>
+<body>
+  <h1>Prueba de Firebase</h1>
+  <p id="resultado">Cargando...</p>
+
+  <script type="module">
+    // Importamos lo que exporta nuestro firebase-config.js
+    import { auth, db } from "./js/firebase-config.js";
+
+    const salida = document.getElementById("resultado");
+
+    // Si auth y db existen, Firebase se inicializó correctamente
+    if (auth && db) {
+      salida.textContent = "✅ Firebase conectado correctamente";
+      salida.style.color = "green";
+      console.log("auth:", auth);
+      console.log("db:", db);
+    } else {
+      salida.textContent = "❌ Firebase NO se inicializó";
+      salida.style.color = "red";
+    }
+  </script>
+</body>
+</html>

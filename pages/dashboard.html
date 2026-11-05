@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · MI PANEL</p>
+        </div>
+        <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard.html">
+            <i class="fas fa-home"></i> Inicio
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="materiasDropdown" role="button" data-bs-toggle="dropdown">
+                        Materias
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="materiasDropdown" id="dropdownMaterias">
+                        <li><a class="dropdown-item" href="inicio.html">Ver todas mis materias</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="perfil.html">
+                        <i class="fas fa-user"></i> Mi Perfil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-2">Bienvenido a tu panel</h3>
+            <p class="mb-0 text-muted" id="bienvenida">Cargando usuario...</p>
+        </div>
+    </div>
+
+    <!-- Anuncios -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-bullhorn me-2"></i> Anuncios recientes
+        </div>
+        <div class="card-body" id="widgetAnuncios">
+            <p class="text-muted small text-center py-3">Cargando...</p>
+        </div>
+    </div>
+
+    <h4 class="mb-3" style="color: var(--azul-oscuro);">
+        <i class="fas fa-graduation-cap me-2"></i> Accesos rápidos
+    </h4>
+
+    <div class="row g-4">
+        <!-- Tarjeta Mis Materias -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-book-open"></i></div>
+                    <h5 class="card-title">Mis Materias</h5>
+                    <p class="card-text">Consulta el contenido de las materias que estás cursando.</p>
+                    <a href="inicio.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta Mis Calificaciones -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-chart-line"></i></div>
+                    <h5 class="card-title">Mis Calificaciones</h5>
+                    <p class="card-text">Revisa tus notas de parciales y actividades.</p>
+                    <a href="calificaciones.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta Actividades Pendientes (NUEVA) -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-warning">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3 bg-warning bg-opacity-10 text-warning"><i class="fas fa-tasks"></i></div>
+                    <h5 class="card-title">Actividades</h5>
+                    <p class="card-text" id="txtActPendientes">Cargando entregas...</p>
+                    <a href="mis-actividades.html" class="btn btn-outline-warning w-100 mt-auto text-dark">Ver mis actividades</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta Mi Perfil -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-user"></i></div>
+                    <h5 class="card-title">Mi Perfil</h5>
+                    <p class="card-text">Consulta y actualiza tu información personal.</p>
+                    <a href="perfil.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Mi Panel
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+    import { listarMaterias } from "../js/materias.js";
+    import { pintarWidgetAnuncios } from "../js/anuncios-widget.js";
+    import { listarTodasEntregasAlumno } from "../js/actividades.js";
+
+    protegerPagina("alumno", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    observarSesion(async ({ logueado, user, rol }) => {
+        if (!logueado) return;
+
+        // 1. Bienvenida
+        document.getElementById("bienvenida").textContent = `Bienvenido, ${user.email} — rol: ${rol}`;
+
+        // 2. Obtener datos del perfil y sus materias
+        const resU = await obtenerUsuario(user.uid);
+        const materiasDelAlumno = resU.ok ? (resU.usuario.materiasAsignadas || []) : [];
+
+        // 3. Anuncios filtrados
+        pintarWidgetAnuncios("widgetAnuncios", {
+            alumnoMaterias: materiasDelAlumno,
+            cantidad: 3
+        });
+
+        // 4. Dropdown de materias
+        await poblarDropdownMaterias(materiasDelAlumno);
+
+        // 5. Contar entregas y pendientes de calificar
+        const resE = await listarTodasEntregasAlumno(user.uid);
+        const entregas = resE.ok ? resE.entregas : [];
+        const porCalificar = entregas.filter(e => e.calificacion === null || e.calificacion === undefined).length;
+        const txtAct = document.getElementById("txtActPendientes");
+
+        if (entregas.length === 0) {
+            txtAct.innerHTML = `Aún no has entregado actividades.`;
+        } else if (porCalificar > 0) {
+            txtAct.innerHTML = `Has entregado <strong>${entregas.length}</strong>.<br>Tienes <strong class="text-warning">${porCalificar}</strong> por calificar.`;
+        } else {
+            txtAct.innerHTML = `Has entregado <strong>${entregas.length}</strong>.<br>¡Todas están calificadas!`;
+        }
+    });
+
+    async function poblarDropdownMaterias(ids) {
+        const ul = document.getElementById("dropdownMaterias");
+        if (!ul) return;
+
+        if (!ids || ids.length === 0) {
+            ul.innerHTML = '<li><span class="dropdown-item text-muted small">Sin materias asignadas</span></li>';
+            return;
+        }
+
+        const res = await listarMaterias();
+        if (!res.ok) {
+            ul.innerHTML = '<li><span class="dropdown-item text-danger small">Error al cargar</span></li>';
+            return;
+        }
+
+        const misMaterias = res.materias.filter((m) => ids.includes(m.id));
+        if (misMaterias.length === 0) {
+            ul.innerHTML = '<li><span class="dropdown-item text-muted small">Sin materias asignadas</span></li>';
+            return;
+        }
+
+        ul.innerHTML = '<li><a class="dropdown-item" href="inicio.html">Ver todas mis materias</a></li>';
+        ul.innerHTML += '<li><hr class="dropdown-divider"></li>';
+
+        misMaterias.forEach((m) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a class="dropdown-item" href="materia.html?id=${m.id}">${m.nombre}</a>`;
+            ul.appendChild(li);
+        });
+    }
+</script>
+
+</body>
+</html>

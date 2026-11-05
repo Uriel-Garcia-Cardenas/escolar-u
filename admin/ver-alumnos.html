@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnos - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · ALUMNOS</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Buscar alumno</strong></label>
+                    <input type="text" class="form-control" id="buscador" placeholder="Nombre o correo...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><strong>Filtrar por materia</strong></label>
+                    <select class="form-select" id="filtroMateria">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="badge bg-info text-dark" id="contador">0 alumnos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-users me-2"></i> Lista de alumnos
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Materias asignadas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAlumnos">
+                        <tr><td colspan="4" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Alumnos
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, observarSesion } from "../js/auth.js";
+    import { listarUsuarios } from "../js/usuarios.js";
+    import { listarMaterias } from "../js/materias.js";
+
+    // Solo admin y supervisor
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) {
+            window.location.href = "../index.html";
+            return;
+        }
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    let alumnos = [];
+    let materias = [];
+
+    function pintar() {
+        const tbody = document.getElementById("tablaAlumnos");
+        const busqueda = document.getElementById("buscador").value.trim().toLowerCase();
+        const filtroMat = document.getElementById("filtroMateria").value;
+
+        let filtrados = alumnos.filter((a) => {
+            const coincideTexto =
+                (a.nombre || "").toLowerCase().includes(busqueda) ||
+                (a.email || "").toLowerCase().includes(busqueda);
+            const coincideMateria =
+                !filtroMat || (a.materiasAsignadas || []).includes(filtroMat);
+            return coincideTexto && coincideMateria;
+        });
+
+        document.getElementById("contador").textContent = `${filtrados.length} alumno(s)`;
+
+        if (filtrados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No se encontraron alumnos.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        filtrados.forEach((a) => {
+            const misMaterias = (a.materiasAsignadas || [])
+                .map((id) => materias.find((m) => m.id === id))
+                .filter(Boolean)
+                .map((m) => `<span class="badge bg-secondary me-1 mb-1">${m.nombre}</span>`)
+                .join("") || '<span class="text-muted small">Sin materias</span>';
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${a.nombre || "—"}</strong></td>
+                <td>${a.email || "—"}</td>
+                <td>${a.telefono || '<span class="text-muted">—</span>'}</td>
+                <td>${misMaterias}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function inicializar() {
+        const [resU, resM] = await Promise.all([listarUsuarios(), listarMaterias()]);
+
+        if (!resU.ok) {
+            document.getElementById("tablaAlumnos").innerHTML =
+                `<tr><td colspan="4" class="text-center text-danger py-4">${resU.error}</td></tr>`;
+            return;
+        }
+
+        alumnos = resU.usuarios.filter((u) => u.rol === "alumno");
+        materias = resM.ok ? resM.materias : [];
+
+        // Cargar filtro
+        const sel = document.getElementById("filtroMateria");
+        materias.forEach((m) => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = m.nombre;
+            sel.appendChild(opt);
+        });
+
+        pintar();
+    }
+
+    document.getElementById("buscador").addEventListener("input", pintar);
+    document.getElementById("filtroMateria").addEventListener("change", pintar);
+
+    inicializar();
+</script>
+
+</body>
+</html>

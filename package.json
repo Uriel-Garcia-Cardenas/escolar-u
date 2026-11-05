@@ -1,0 +1,14 @@
+{
+  "name": "escolar_u",
+  "version": "1.0.0",
+  "description": "Sistema escolar con Supabase",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo \"Abre index.html con Live Server\""
+  },
+  "author": "URIELGC",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.2"
+  }
+}

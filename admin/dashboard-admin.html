@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · PANEL ADMINISTRADOR</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard-admin.html">
+            <i class="fas fa-home"></i> Inicio
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item me-3">
+                    <form class="d-flex" onsubmit="event.preventDefault(); window.location.href='../pages/buscar.html?q=' + encodeURIComponent(this.buscar.value);">
+                        <input type="text" name="buscar" class="form-control form-control-sm" placeholder="Buscar..." style="width:180px;">
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- 1. Bienvenida -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-2">Panel de Administrador</h3>
+            <p class="mb-0 text-muted" id="bienvenida">Cargando usuario...</p>
+        </div>
+    </div>
+
+    <!-- 2. Anuncios vigentes -->
+    <div class="card mb-5">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-bullhorn me-2"></i> Anuncios recientes</span>
+            <a href="anuncios.html" class="btn btn-sm btn-outline-primary">Gestionar</a>
+        </div>
+        <div class="card-body" id="widgetAnuncios">
+            <p class="text-muted small text-center py-3">Cargando...</p>
+        </div>
+    </div>
+
+    <!-- 3. Herramientas de administración agrupadas -->
+    <h4 class="mb-4" style="color: var(--azul-oscuro);">
+        <i class="fas fa-tools me-2"></i> Herramientas de administración
+    </h4>
+
+    <!-- GRUPO: USUARIOS -->
+    <h5 class="mb-3 pb-2 border-bottom text-secondary">
+        <i class="fas fa-users-cog me-2"></i> Usuarios y Accesos
+    </h5>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-users"></i></div>
+                    <h5 class="card-title">Gestión de Usuarios</h5>
+                    <p class="card-text">Crear usuarios y asignar roles (admin, supervisor, alumno).</p>
+                    <a href="usuarios.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-user-check"></i></div>
+                    <h5 class="card-title">Asignar Materias</h5>
+                    <p class="card-text">Determina qué materias cursa cada alumno.</p>
+                    <a href="asignar-materias.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3 bg-warning bg-opacity-10 text-warning"><i class="fas fa-user-plus"></i></div>
+                    <h5 class="card-title">Solicitudes de Ingreso</h5>
+                    <p class="card-text" id="txtSolicitudesPendientes">Cargando...</p>
+                    <a href="solicitudes.html" class="btn btn-outline-warning text-dark w-100 mt-auto">Revisar solicitudes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+           
+
+    <!-- GRUPO: CONTENIDO ACADÉMICO -->
+    <h5 class="mb-3 pb-2 border-bottom text-secondary">
+        <i class="fas fa-book-open me-2"></i> Gestión Académica (Contenido)
+    </h5>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-book"></i></div>
+                    <h5 class="card-title">Materias</h5>
+                    <p class="card-text">Crear, editar y eliminar materias del plan de estudios.</p>
+                    <a href="gestion-materias.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-layer-group"></i></div>
+                    <h5 class="card-title">Unidades</h5>
+                    <p class="card-text">Crear el contenido de cada materia (hojas, videos, etc).</p>
+                    <a href="gestion-unidades.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-tasks"></i></div>
+                    <h5 class="card-title">Actividades</h5>
+                    <p class="card-text">Crear y gestionar tareas, subir recursos y fechas de entrega.</p>
+                    <a href="actividades.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRUPO: EVALUACIÓN -->
+    <h5 class="mb-3 pb-2 border-bottom text-secondary">
+        <i class="fas fa-clipboard-check me-2"></i> Evaluación y Calificaciones
+    </h5>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-chart-line"></i></div>
+                    <h5 class="card-title">Calificar Parciales</h5>
+                    <p class="card-text">Registrar y editar calificaciones oficiales (1, 2, 3, Final).</p>
+                    <a href="calificar.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-success">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3 bg-success bg-opacity-10 text-success"><i class="fas fa-file-import"></i></div>
+                    <h5 class="card-title">Revisar Entregas</h5>
+                    <p class="card-text" id="txtEntregasPendientes">Cargando...</p>
+                    <a href="revisar-entregas.html" class="btn btn-outline-success w-100 mt-auto">Ir a calificar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRUPO: SISTEMA -->
+    <h5 class="mb-3 pb-2 border-bottom text-secondary">
+        <i class="fas fa-server me-2"></i> Comunicación y Sistema
+    </h5>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-bullhorn"></i></div>
+                    <h5 class="card-title">Anuncios</h5>
+                    <p class="card-text">Publicar comunicados para todos los usuarios o por materia.</p>
+                    <a href="anuncios.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+
+                <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-address-card"></i></div>
+                    <h5 class="card-title">Datos de Contacto</h5>
+                    <p class="card-text">Editar la información que aparece en el modal de contacto del inicio.</p>
+                    <a href="contacto.html" class="btn btn-outline-primary w-100 mt-auto">Editar contacto</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="hash-icon mb-3"><i class="fas fa-history"></i></div>
+                    <h5 class="card-title">Logs del Sistema</h5>
+                    <p class="card-text">Historial de actividad: quién hizo qué y cuándo.</p>
+                    <a href="logs.html" class="btn btn-outline-primary w-100 mt-auto">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Distribución por rol + actividad reciente -->
+    <h4 class="mb-4 mt-5" style="color: var(--azul-oscuro);">
+        <i class="fas fa-chart-pie me-2"></i> Resumen de Actividad
+    </h4>
+    <div class="row g-4 mb-5">
+        <div class="col-md-5">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fas fa-users me-2"></i> Usuarios por rol
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-user-shield text-dark me-2"></i> Administradores</span>
+                        <span class="badge bg-dark" id="rolAdmin">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-user-tie text-primary me-2"></i> Supervisores</span>
+                        <span class="badge bg-primary" id="rolSupervisor">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-user-graduate text-success me-2"></i> Alumnos</span>
+                        <span class="badge bg-success" id="rolAlumno">—</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Total</span>
+                        <span class="badge bg-secondary" id="rolTotal">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-history me-2"></i> Actividad reciente</span>
+                    <a href="logs.html" class="btn btn-sm btn-outline-primary">Ver todo</a>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="listaActividad">
+                        <li class="list-group-item text-muted small">Cargando...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Tarjetas de estadísticas totales (Global) -->
+    <h4 class="mb-3 mt-5" style="color: var(--azul-oscuro);">
+        <i class="fas fa-chart-bar me-2"></i> Resumen Global
+    </h4>
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-2"><i class="fas fa-users"></i></div>
+                    <div class="stat-num" id="numUsuarios">—</div>
+                    <div class="stat-label">Usuarios</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success mb-2"><i class="fas fa-book"></i></div>
+                    <div class="stat-num" id="numMaterias">—</div>
+                    <div class="stat-label">Materias</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning mb-2"><i class="fas fa-layer-group"></i></div>
+                    <div class="stat-num" id="numUnidades">—</div>
+                    <div class="stat-label">Unidades</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info mb-2"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="stat-num" id="numCalificaciones">—</div>
+                    <div class="stat-label">Calificaciones</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-danger bg-opacity-10 text-danger mb-2"><i class="fas fa-tasks"></i></div>
+                    <div class="stat-num" id="numActividades">—</div>
+                    <div class="stat-label">Actividades</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-2">
+                    <div class="stat-icon bg-secondary bg-opacity-10 text-secondary mb-2"><i class="fas fa-file-upload"></i></div>
+                    <div class="stat-num" id="numEntregas">—</div>
+                    <div class="stat-label">Entregas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Panel Administrador
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerEstadisticas, obtenerUsuariosPorRol } from "../js/stats.js";
+    import { listarLogs, formatearFecha } from "../js/logs.js";
+    import { pintarWidgetAnuncios } from "../js/anuncios-widget.js";
+    import { contarEntregasPorCalificar } from "../js/actividades.js";
+    import { contarSolicitudesPendientes } from "../js/solicitudes.js";
+
+    protegerPagina("admin", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // Bienvenida
+    observarSesion(({ logueado, user, rol }) => {
+        if (logueado) {
+            document.getElementById("bienvenida").textContent =
+                `Bienvenido, ${user.email} — rol: ${rol}`;
+        }
+    });
+
+    // Widget de anuncios
+    pintarWidgetAnuncios("widgetAnuncios", { staffVeTodo: true });
+
+    // Estadísticas numéricas
+    async function cargarStats() {
+        const res = await obtenerEstadisticas();
+        if (!res.ok) return;
+
+        document.getElementById("numUsuarios").textContent       = res.stats.usuarios;
+        document.getElementById("numMaterias").textContent       = res.stats.materias;
+        document.getElementById("numUnidades").textContent       = res.stats.unidades;
+        document.getElementById("numCalificaciones").textContent = res.stats.calificaciones;
+        document.getElementById("numActividades").textContent    = res.stats.actividades;
+        document.getElementById("numEntregas").textContent       = res.stats.entregas;
+    }
+
+    // Usuarios por rol
+    async function cargarRoles() {
+        const res = await obtenerUsuariosPorRol();
+        if (!res.ok) return;
+
+        const r = res.roles;
+        document.getElementById("rolAdmin").textContent      = r.admin;
+        document.getElementById("rolSupervisor").textContent = r.supervisor;
+        document.getElementById("rolAlumno").textContent     = r.alumno;
+        document.getElementById("rolTotal").textContent      = r.admin + r.supervisor + r.alumno + r.otros;
+    }
+
+    // Actividad reciente (últimos 6 eventos)
+    async function cargarActividad() {
+        const ul = document.getElementById("listaActividad");
+        const res = await listarLogs(6);
+
+        if (!res.ok || res.logs.length === 0) {
+            ul.innerHTML = '<li class="list-group-item text-muted small">Sin actividad reciente.</li>';
+            return;
+        }
+
+        ul.innerHTML = "";
+        res.logs.forEach((l) => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-start";
+            li.innerHTML = `
+                <div class="me-2">
+                    <div class="small"><strong>${l.email || "—"}</strong></div>
+                    <div class="small text-muted">${l.detalle || l.accion || ""}</div>
+                </div>
+                <span class="text-muted small text-nowrap">${formatearFecha(l.fecha)}</span>
+            `;
+            ul.appendChild(li);
+        });
+    }
+
+    // Entregas pendientes para la tarjeta de herramienta
+    async function cargarEntregasPendientes() {
+        const res = await contarEntregasPorCalificar();
+        const el = document.getElementById("txtEntregasPendientes");
+        if (res.ok) {
+            if (res.cantidad > 0) {
+                el.innerHTML = `Hay <strong class="text-danger">${res.cantidad}</strong> entrega(s) esperando calificación.`;
+            } else {
+                el.textContent = "No hay entregas pendientes.";
+            }
+        } else {
+            el.textContent = "Error al cargar.";
+        }
+    }
+        async function cargarSolicitudes() {
+        const res = await contarSolicitudesPendientes();
+        const el = document.getElementById("txtSolicitudesPendientes");
+        if (res.ok) {
+            if (res.cantidad > 0) {
+                el.innerHTML = `Hay <strong class="text-danger">${res.cantidad}</strong> solicitud(es) esperando tu revisión.`;
+            } else {
+                el.textContent = "No hay solicitudes pendientes.";
+            }
+        } else {
+            el.textContent = "Error al cargar.";
+        }
+    }
+    cargarSolicitudes(); // <-- Agrega esta llamada
+
+    // Iniciar todo
+    cargarStats();
+    cargarRoles();
+    cargarActividad();
+    cargarEntregasPendientes();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - ESCOLAR_U</title>
+  <style>
+    body { font-family: sans-serif; max-width: 400px; margin: 60px auto; padding: 20px; }
+    input, button { width: 100%; padding: 10px; margin: 6px 0; box-sizing: border-box; }
+    button { background: #004a99; color: white; border: none; cursor: pointer; }
+    button:hover { background: #003a7a; }
+    #mensaje { margin-top: 12px; padding: 10px; border-radius: 4px; display: none; }
+    .error   { background: #fde0e0; color: #a00; display: block !important; }
+    .ok      { background: #e0f7e0; color: #070; display: block !important; }
+  </style>
+</head>
+<body>
+  <h1>Iniciar sesión</h1>
+
+  <input type="email"    id="email"    placeholder="Correo">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button id="btnLogin">Entrar</button>
+
+  <div id="mensaje"></div>
+
+  <script type="module">
+    import { login, observarSesion } from "../js/auth.js";
+
+    const emailInput = document.getElementById("email");
+    const passInput  = document.getElementById("password");
+    const btn        = document.getElementById("btnLogin");
+    const mensaje    = document.getElementById("mensaje");
+
+    // 1. Al cargar la página, ¿ya hay sesión activa?
+    observarSesion(({ logueado, user, rol }) => {
+      if (logueado) {
+        mensaje.className = "ok";
+        mensaje.textContent = `Ya hay sesión: ${user.email} (rol: ${rol})`;
+      }
+    });
+
+    // 2. Al hacer clic en "Entrar"
+    btn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const pass  = passInput.value;
+
+      if (!email || !pass) {
+        mensaje.className = "error";
+        mensaje.textContent = "Llena correo y contraseña";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Entrando...";
+
+      const resultado = await login(email, pass);
+
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+
+      if (resultado.ok) {
+        mensaje.className = "ok";
+        mensaje.textContent = `Bienvenido, ${resultado.user.email}`;
+      } else {
+        mensaje.className = "error";
+        mensaje.textContent = resultado.error;
+      }
+    });
+  </script>
+</body>
+</html>

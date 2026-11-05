@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Actividades - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · MIS ACTIVIDADES</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h3 class="card-title mb-1">Mis Actividades</h3>
+                <p class="mb-0 text-muted" id="bienvenida">Cargando tareas...</p>
+            </div>
+            <div class="mt-2 mt-md-0">
+                <span class="badge bg-warning text-dark fs-6 me-2" id="badgePendientes">0 Pendientes</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <ul class="nav nav-tabs mb-4" id="filtrosActividades" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-pendientes" data-bs-toggle="tab" data-bs-target="#panel-pendientes" type="button" role="tab">
+                <i class="fas fa-clock me-1"></i> Pendientes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-entregadas" data-bs-toggle="tab" data-bs-target="#panel-entregadas" type="button" role="tab">
+                <i class="fas fa-paper-plane me-1"></i> Entregadas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-calificadas" data-bs-toggle="tab" data-bs-target="#panel-calificadas" type="button" role="tab">
+                <i class="fas fa-check-circle me-1"></i> Calificadas
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de los filtros -->
+    <div class="tab-content" id="contenidoActividades">
+        
+        <!-- Pendientes -->
+        <div class="tab-pane fade show active" id="panel-pendientes" role="tabpanel">
+            <div id="listaPendientes" class="row g-4">
+                <div class="col-12 text-center text-muted py-4">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- Entregadas -->
+        <div class="tab-pane fade" id="panel-entregadas" role="tabpanel">
+            <div id="listaEntregadas" class="row g-4">
+                <div class="col-12 text-center text-muted py-4">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- Calificadas -->
+        <div class="tab-pane fade" id="panel-calificadas" role="tabpanel">
+            <div id="listaCalificadas" class="row g-4">
+                <div class="col-12 text-center text-muted py-4">Cargando...</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Mis Actividades
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+    import { listarMaterias } from "../js/materias.js";
+    import { listarActividadesPorMateria, listarTodasEntregasAlumno, formatearFechaLimite, estaVencida } from "../js/actividades.js";
+
+    protegerPagina("alumno", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    observarSesion(async ({ logueado, user }) => {
+        if (!logueado) return;
+
+        // 1. Cargar perfil
+        const resU = await obtenerUsuario(user.uid);
+        if (!resU.ok) return;
+        
+        document.getElementById("bienvenida").textContent = `Alumno: ${resU.usuario.nombre || user.email}`;
+        const misMateriasIds = resU.usuario.materiasAsignadas || [];
+
+        if (misMateriasIds.length === 0) {
+            document.getElementById("listaPendientes").innerHTML = '<div class="col-12 alert alert-info text-center">No tienes materias asignadas.</div>';
+            return;
+        }
+
+        // 2. Obtener todas las materias, actividades y entregas
+        const resMat = await listarMaterias();
+        const misMaterias = resMat.ok ? resMat.materias.filter(m => misMateriasIds.includes(m.id)) : [];
+
+        const resEntregas = await listarTodasEntregasAlumno(user.uid);
+        const entregas = resEntregas.ok ? resEntregas.entregas : [];
+
+        let todasLasActividades = [];
+        
+        // 3. Juntar todas las actividades de todas sus materias
+        for (const mat of misMaterias) {
+            const resActs = await listarActividadesPorMateria(mat.id, true);
+            if (resActs.ok) {
+                resActs.actividades.forEach(act => {
+                    todasLasActividades.push({
+                        ...act,
+                        materiaNombre: mat.nombre,
+                        entrega: entregas.find(e => e.actividadId === act.id) || null
+                    });
+                });
+            }
+        }
+
+        // 4. Separar por estados
+        let pendientes = [];
+        let entregadas = [];
+        let calificadas = [];
+
+        todasLasActividades.forEach(act => {
+            if (!act.entrega) {
+                pendientes.push(act);
+            } else if (act.entrega.calificacion !== null && act.entrega.calificacion !== undefined) {
+                calificadas.push(act);
+            } else {
+                entregadas.push(act);
+            }
+        });
+
+        // Ordenar pendientes por fecha límite (los más próximos primero)
+        pendientes.sort((a, b) => {
+            const fA = a.fechaLimite?.seconds || 0;
+            const fB = b.fechaLimite?.seconds || 0;
+            return fA - fB;
+        });
+
+        document.getElementById("badgePendientes").textContent = `${pendientes.length} Pendientes`;
+
+        // 5. Renderizar
+        renderizarLista(pendientes, "listaPendientes", "pendiente");
+        renderizarLista(entregadas, "listaEntregadas", "entregada");
+        renderizarLista(calificadas, "listaCalificadas", "calificada");
+    });
+
+    function renderizarLista(array, containerId, estado) {
+        const cont = document.getElementById(containerId);
+        
+        if (array.length === 0) {
+            cont.innerHTML = `<div class="col-12 text-center text-muted py-5"><i class="fas fa-check-circle fs-1 mb-3 text-success"></i><br>No hay actividades en esta sección.</div>`;
+            return;
+        }
+
+        cont.innerHTML = "";
+        array.forEach(act => {
+            const vencida = estaVencida(act);
+            let colorBorde = "var(--azul-medio)";
+            let badgeEstado = "";
+
+            if (estado === "pendiente") {
+                colorBorde = vencida ? "#dc3545" : "#ffc107"; // Rojo si venció, amarillo si pendiente
+                badgeEstado = vencida ? '<span class="badge bg-danger">Vencida</span>' : '<span class="badge bg-warning text-dark">Pendiente</span>';
+            } else if (estado === "entregada") {
+                colorBorde = "#0d6efd";
+                badgeEstado = '<span class="badge bg-primary">Por calificar</span>';
+            } else {
+                colorBorde = "#198754";
+                badgeEstado = `<span class="badge bg-success">Calificación: ${act.entrega.calificacion}</span>`;
+            }
+
+            const card = document.createElement("div");
+            card.className = "col-md-6 col-lg-4";
+            card.innerHTML = `
+                <div class="card h-100" style="border-left: 4px solid ${colorBorde};">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-secondary">${act.materiaNombre}</span>
+                            ${badgeEstado}
+                        </div>
+                        <h5 class="card-title">${act.titulo}</h5>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-calendar me-1"></i> ${formatearFechaLimite(act)}
+                        </p>
+                        <a href="materia.html?id=${act.materiaId}" class="btn btn-outline-primary w-100 mt-auto">
+                            ${estado === "pendiente" ? "Entregar ahora" : "Ver detalle"}
+                        </a>
+                    </div>
+                </div>
+            `;
+            cont.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>

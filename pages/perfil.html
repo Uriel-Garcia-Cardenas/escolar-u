@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · MI PERFIL</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="row g-4">
+
+        <!-- Panel izquierdo: tarjeta con foto -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <img id="fotoPerfil"
+                         src="../assets/images/info.png"
+                         class="rounded-circle shadow-sm mb-3"
+                         style="width:160px; height:160px; object-fit:cover; border:4px solid var(--azul-claro);"
+                         onerror="this.src='../assets/images/info.png'">
+                    <h4 class="mb-1" id="nombreCard">—</h4>
+                    <p class="text-muted mb-1" id="emailCard">—</p>
+                    <span class="badge bg-primary" id="rolCard">—</span>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="fas fa-book me-2"></i> Materias asignadas
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-group list-group-flush" id="listaMaterias">
+                        <li class="list-group-item text-muted small">Cargando...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho: formulario -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-edit me-2"></i> Editar información
+                </div>
+                <div class="card-body">
+                    <form id="formPerfil">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="nombre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Correo (no editable)</label>
+                                <input type="email" class="form-control" id="email" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" placeholder="55 1234 5678">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" placeholder="Calle, colonia, ciudad">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Biografía</label>
+                                <textarea class="form-control" id="biografia" rows="3"
+                                          placeholder="Cuéntanos algo sobre ti (máx. 300 caracteres)"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Foto de perfil (URL)</label>
+                                <input type="url" class="form-control" id="fotoUrl"
+                                       placeholder="https://drive.google.com/file/d/XXXX/view  o  https://i.imgur.com/XXXX.jpg">
+                                <small class="text-muted">
+                                    Pega un enlace público de Drive, ImgBB, Imgur o cualquier URL directa de imagen.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary" id="btnGuardar">
+                                <i class="fas fa-save me-1"></i> Guardar cambios
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnRecargar">
+                                Descartar cambios
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="mensaje" class="mt-3" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Mi Perfil
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerUsuario, actualizarPerfil } from "../js/usuarios.js";
+    import { listarMaterias } from "../js/materias.js";
+
+    protegerPagina("alumno", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // ---------- Helpers ----------
+    function convertirUrlImagen(url) {
+        if (!url) return "";
+        const u = url.trim();
+
+        let m = u.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/);
+        if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+        m = u.match(/drive\.google\.com\/open\?id=([A-Za-z0-9_-]+)/);
+        if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+        m = u.match(/drive\.google\.com\/uc\?.*id=([A-Za-z0-9_-]+)/);
+        if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+        if (u.includes("dropbox.com")) {
+            return u.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
+        }
+        return u;
+    }
+
+    function mostrarMsg(texto, tipo) {
+        const m = document.getElementById("mensaje");
+        m.style.display = "block";
+        m.className = tipo === "ok" ? "alert alert-success" : "alert alert-danger";
+        m.textContent = texto;
+        setTimeout(() => { m.style.display = "none"; }, 4000);
+    }
+
+    let usuarioActual = null;
+
+    // ---------- Cargar perfil ----------
+    async function cargarPerfil(uid) {
+        const res = await obtenerUsuario(uid);
+        if (!res.ok) {
+            mostrarMsg(res.error, "error");
+            return;
+        }
+        usuarioActual = res.usuario;
+
+        // Rellenar formulario
+        document.getElementById("nombre").value    = usuarioActual.nombre || "";
+        document.getElementById("email").value     = usuarioActual.email || "";
+        document.getElementById("telefono").value  = usuarioActual.telefono || "";
+        document.getElementById("direccion").value = usuarioActual.direccion || "";
+        document.getElementById("biografia").value = usuarioActual.biografia || "";
+        document.getElementById("fotoUrl").value   = usuarioActual.fotoUrl || "";
+
+        // Tarjeta lateral
+        document.getElementById("nombreCard").textContent = usuarioActual.nombre || "Sin nombre";
+        document.getElementById("emailCard").textContent  = usuarioActual.email  || "—";
+        document.getElementById("rolCard").textContent    = usuarioActual.rol    || "—";
+
+        // Foto
+        if (usuarioActual.fotoUrl) {
+            document.getElementById("fotoPerfil").src = convertirUrlImagen(usuarioActual.fotoUrl);
+        }
+
+        // Materias asignadas
+        await cargarMateriasDelAlumno(usuarioActual.materiasAsignadas || []);
+    }
+
+    async function cargarMateriasDelAlumno(ids) {
+        const ul = document.getElementById("listaMaterias");
+
+        if (!ids || ids.length === 0) {
+            ul.innerHTML = '<li class="list-group-item text-muted small">No tienes materias asignadas.</li>';
+            return;
+        }
+
+        const res = await listarMaterias();
+        if (!res.ok) {
+            ul.innerHTML = '<li class="list-group-item text-danger small">No se pudieron cargar.</li>';
+            return;
+        }
+
+        const misMaterias = res.materias.filter((m) => ids.includes(m.id));
+
+        if (misMaterias.length === 0) {
+            ul.innerHTML = '<li class="list-group-item text-muted small">No tienes materias asignadas.</li>';
+            return;
+        }
+
+        ul.innerHTML = "";
+        misMaterias.forEach((m) => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center small";
+            li.innerHTML = `
+                <span>${m.nombre}</span>
+                <span class="badge bg-secondary">${m.orden ?? "—"}</span>
+            `;
+            ul.appendChild(li);
+        });
+    }
+
+    // ---------- Vista previa de foto al escribir URL ----------
+    document.getElementById("fotoUrl").addEventListener("input", (e) => {
+        const url = e.target.value.trim();
+        const img = document.getElementById("fotoPerfil");
+        img.src = url ? convertirUrlImagen(url) : "../assets/images/info.png";
+        img.onerror = () => { img.src = "../assets/images/info.png"; };
+    });
+
+    // ---------- Guardar cambios ----------
+    document.getElementById("formPerfil").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById("btnGuardar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+
+        const datos = {
+            nombre:    document.getElementById("nombre").value.trim(),
+            telefono:  document.getElementById("telefono").value.trim(),
+            direccion: document.getElementById("direccion").value.trim(),
+            biografia: document.getElementById("biografia").value.trim(),
+            fotoUrl:   document.getElementById("fotoUrl").value.trim()
+        };
+
+        const res = await actualizarPerfil(usuarioActual.uid, datos);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save me-1"></i> Guardar cambios';
+
+        if (res.ok) {
+            mostrarMsg("✅ Perfil actualizado correctamente", "ok");
+            // Refrescar tarjeta lateral
+            document.getElementById("nombreCard").textContent = datos.nombre || "Sin nombre";
+            if (datos.fotoUrl) {
+                document.getElementById("fotoPerfil").src = convertirUrlImagen(datos.fotoUrl);
+            }
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    // ---------- Descartar cambios ----------
+    document.getElementById("btnRecargar").addEventListener("click", () => {
+        if (!usuarioActual) return;
+        document.getElementById("nombre").value    = usuarioActual.nombre || "";
+        document.getElementById("telefono").value  = usuarioActual.telefono || "";
+        document.getElementById("direccion").value = usuarioActual.direccion || "";
+        document.getElementById("biografia").value = usuarioActual.biografia || "";
+        document.getElementById("fotoUrl").value   = usuarioActual.fotoUrl || "";
+        mostrarMsg("Cambios descartados", "ok");
+    });
+
+    // ---------- Inicial ----------
+    observarSesion(({ logueado, user }) => {
+        if (logueado) cargarPerfil(user.uid);
+    });
+</script>
+
+</body>
+</html>

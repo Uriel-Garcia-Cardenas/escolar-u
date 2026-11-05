@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos de Contacto - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · DATOS DE CONTACTO</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4 mb-5">
+
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-white pb-0 border-bottom-0">
+            <h3 class="mb-0" style="color: var(--azul-oscuro);">
+                <i class="fas fa-address-card me-2"></i> Editar Información de Contacto
+            </h3>
+            <p class="text-muted small mt-2">Esta información aparecerá en el modal de "Contacto" en la página de inicio.</p>
+        </div>
+        <div class="card-body">
+            <form id="formContacto">
+                
+                                <!-- Datos del Profesor -->
+                <h5 class="mb-3 pb-2 border-bottom text-secondary">👤 Datos del Profesor</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="nombre">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="correo">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Enlace de Facebook (opcional)</label>
+                        <input type="url" class="form-control" id="facebook">
+                    </div>
+                </div>
+
+                <!-- Horarios y Atención -->
+                <h5 class="mb-3 pb-2 border-bottom text-secondary">⏰ Horarios y Atención</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Horario de Oficina</label>
+                        <input type="text" class="form-control" id="horarioOficina">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Atención en línea</label>
+                        <input type="text" class="form-control" id="atencionEnLinea">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Nota adicional (alerta azul al final del modal)</label>
+                        <input type="text" class="form-control" id="notaAdicional">
+                    </div>
+                </div>
+
+                <!-- Horario de Clases -->
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="mb-0 text-secondary">📅 Horario de Clases</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAgregarClase">
+                        <i class="fas fa-plus"></i> Agregar clase
+                    </button>
+                </div>
+                
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle" id="tablaHorarios">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 20%;">Día</th>
+                                <th style="width: 25%;">Horario</th>
+                                <th style="width: 35%;">Materia</th>
+                                <th style="width: 15%;">Aula</th>
+                                <th style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTablaHorarios">
+                            <!-- Las filas se generan con JS -->
+                        </tbody>
+                    </table>
+                    <div id="sinClases" class="text-center text-muted small d-none">No hay clases registradas.</div>
+                </div>
+
+                <hr>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary btn-lg" id="btnGuardar">
+                        <i class="fas fa-save me-2"></i> Guardar Cambios
+                    </button>
+                </div>
+                
+                <div id="mensaje" class="mt-3" style="display:none;"></div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Datos de Contacto
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerContacto, guardarContacto } from "../js/contacto.js";
+
+    // Guardia de seguridad
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) { window.location.href = "../index.html"; return; }
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    const cuerpoTabla = document.getElementById("cuerpoTablaHorarios");
+    const form = document.getElementById("formContacto");
+    const btnGuardar = document.getElementById("btnGuardar");
+    const divMensaje = document.getElementById("mensaje");
+
+    // 1. Cargar datos al abrir la página
+    async function cargarDatos() {
+        const res = await obtenerContacto();
+        if (!res.ok) {
+            mostrarMsg(res.error, "error");
+            return;
+        }
+
+        const d = res.datos;
+        document.getElementById("nombre").value = d.nombre || "";
+        document.getElementById("correo").value = d.correo || "";
+        document.getElementById("telefono").value = d.telefono || "";
+        document.getElementById("facebook").value = d.facebook || "";
+        document.getElementById("horarioOficina").value = d.horarioOficina || "";
+        document.getElementById("atencionEnLinea").value = d.atencionEnLinea || "";
+        document.getElementById("notaAdicional").value = d.notaAdicional || "";
+
+        // Cargar tabla de horarios
+        cuerpoTabla.innerHTML = "";
+        if (d.horarioClases && d.horarioClases.length > 0) {
+            d.horarioClases.forEach(h => agregarFila(h));
+        } else {
+            agregarFila(); // Agrega una fila vacía si no hay ninguna
+        }
+    }
+
+    // 2. Función para agregar filas a la tabla
+    function agregarFila(datos = { dia: "", horario: "", materia: "", aula: "" }) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><input type="text" class="form-control form-control-sm inp-dia" value="${datos.dia || ''}" placeholder="Ej: Lunes" required></td>
+            <td><input type="text" class="form-control form-control-sm inp-horario" value="${datos.horario || ''}" placeholder="Ej: 10:00 - 12:00" required></td>
+            <td><input type="text" class="form-control form-control-sm inp-materia" value="${datos.materia || ''}" placeholder="Nombre de la materia" required></td>
+            <td><input type="text" class="form-control form-control-sm inp-aula" value="${datos.aula || ''}" placeholder="Ej: Aula 1" required></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar fila">
+                    <i class="fas fa-times"></i>
+                </button>
+            </td>
+        `;
+        cuerpoTabla.appendChild(tr);
+
+        // Listener para el botón de eliminar
+        tr.querySelector(".btn-eliminar").addEventListener("click", () => {
+            tr.remove();
+            revisarTablaVacia();
+        });
+    }
+
+    function revisarTablaVacia() {
+        const sinClases = document.getElementById("sinClases");
+        if (cuerpoTabla.children.length === 0) {
+            sinClases.classList.remove("d-none");
+        } else {
+            sinClases.classList.add("d-none");
+        }
+    }
+
+    document.getElementById("btnAgregarClase").addEventListener("click", () => {
+        agregarFila();
+        revisarTablaVacia();
+    });
+
+    // 3. Guardar cambios
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+                // Recolectar horarios de la tabla
+        const horarios = [];
+        const filas = cuerpoTabla.querySelectorAll("tr");
+        
+        for (const fila of filas) {
+            // Si un campo está vacío, se guarda "No disponible"
+            const dia = fila.querySelector(".inp-dia").value.trim() || "No disponible";
+            const horario = fila.querySelector(".inp-horario").value.trim() || "No disponible";
+            const materia = fila.querySelector(".inp-materia").value.trim() || "No disponible";
+            const aula = fila.querySelector(".inp-aula").value.trim() || "No disponible";
+
+            // Si la fila entera está vacía, no la guardamos
+            if (dia !== "No disponible" || horario !== "No disponible" || materia !== "No disponible" || aula !== "No disponible") {
+                horarios.push({ dia, horario, materia, aula });
+            }
+        }
+
+        // Recolectar datos del profesor (con valor por defecto)
+        const datos = {
+            nombre: document.getElementById("nombre").value.trim() || "No disponible",
+            correo: document.getElementById("correo").value.trim() || "No disponible",
+            telefono: document.getElementById("telefono").value.trim() || "No disponible",
+            facebook: document.getElementById("facebook").value.trim() || "No disponible",
+            horarioOficina: document.getElementById("horarioOficina").value.trim() || "No disponible",
+            atencionEnLinea: document.getElementById("atencionEnLinea").value.trim() || "No disponible",
+            notaAdicional: document.getElementById("notaAdicional").value.trim() || "No disponible",
+            horarioClases: horarios
+        };
+
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+
+        const res = await guardarContacto(datos);
+
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = '<i class="fas fa-save me-2"></i> Guardar Cambios';
+
+        if (res.ok) {
+            mostrarMsg("✅ Información actualizada correctamente", "ok");
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    // Utilidades
+    function mostrarMsg(texto, tipo) {
+        divMensaje.style.display = "block";
+        divMensaje.className = tipo === "ok" ? "alert alert-success" : "alert alert-danger";
+        divMensaje.textContent = texto;
+        setTimeout(() => { divMensaje.style.display = "none"; }, 4000);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Inicializar
+    cargarDatos();
+</script>
+
+</body>
+</html>

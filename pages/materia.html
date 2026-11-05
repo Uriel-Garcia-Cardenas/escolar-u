@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materia - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · PLATAFORMA EDUCATIVA</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="inicio.html">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Info de la materia -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title mb-2" id="tituloMateria">Cargando...</h2>
+            <p class="mb-0 text-muted" id="descripcionMateria"></p>
+        </div>
+    </div>
+
+    <!-- NUEVO: Actividades -->
+    <div class="card mb-4" id="cardActividades">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-tasks me-2"></i> Actividades</span>
+            <span class="badge bg-info text-dark" id="contadorActividades">—</span>
+        </div>
+        <div class="card-body" id="listaActividades">
+            <p class="text-muted small text-center py-3">Cargando actividades...</p>
+        </div>
+    </div>
+
+    <!-- Unidades (existente) -->
+    <div id="contenedor-unidades">
+        <div class="text-center text-muted py-5">Cargando unidades...</div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Plataforma Educativa
+    </div>
+</footer>
+
+<!-- Modal de actividad -->
+<div class="modal fade" id="modalActividad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitulo">Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerMateria } from "../js/materias.js";
+    import { listarUnidades } from "../js/unidades.js";
+    import { renderizarUnidad, renderHoja, normalizarUrlVideo, convertirUrlImagen } from "../js/render.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+    import {
+        listarActividadesPorMateria, listarEntregasAlumnoMateria,
+        guardarEntrega, estaVencida, formatearFechaLimite
+    } from "../js/actividades.js";
+
+    protegerPagina("alumno", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // ---------- Estado ----------
+    const params = new URLSearchParams(window.location.search);
+    const materiaId = params.get("id");
+    let materiaActual = null;
+    let alumnoUid = null;
+    let actividades = [];
+    let entregas = [];
+    let modalBootstrap = null;
+
+    // ---------- Arranque ----------
+    if (!materiaId) {
+        document.getElementById("tituloMateria").textContent = "Materia no especificada";
+        document.getElementById("contenedor-unidades").innerHTML =
+            '<div class="alert alert-warning">Falta el parámetro <code>?id=</code> en la URL.</div>';
+    } else {
+        observarSesion(async ({ logueado, user, rol }) => {
+            if (!logueado) return;
+            alumnoUid = user.uid;
+            await cargarMateriaCompleta(user.uid, rol);
+        });
+    }
+
+    // ---------- Carga principal ----------
+    async function cargarMateriaCompleta(uid, rol) {
+        // 1. Materia
+        const resM = await obtenerMateria(materiaId);
+        if (!resM.ok) {
+            document.getElementById("tituloMateria").textContent = "Materia no encontrada";
+            return;
+        }
+        materiaActual = resM.materia;
+        document.getElementById("tituloMateria").textContent = materiaActual.nombre || "Materia";
+        document.getElementById("descripcionMateria").textContent = materiaActual.descripcion || "";
+
+        // 2. Verificar acceso (solo si es alumno)
+        if (rol === "alumno") {
+            const resU = await obtenerUsuario(uid);
+            if (resU.ok) {
+                const asignadas = resU.usuario.materiasAsignadas || [];
+                if (!asignadas.includes(materiaId)) {
+                    document.getElementById("contenedor-unidades").innerHTML =
+                        '<div class="alert alert-warning"><i class="fas fa-lock me-2"></i>No tienes acceso a esta materia.</div>';
+                    document.getElementById("listaActividades").innerHTML =
+                        '<p class="text-muted text-center py-3">Sin acceso.</p>';
+                    return;
+                }
+            }
+        }
+
+        // 3. Unidades
+        await cargarUnidades();
+
+        // 4. Actividades + entregas
+        await cargarActividades(uid);
+    }
+
+    // ---------- Cargar unidades ----------
+    async function cargarUnidades() {
+        const cont = document.getElementById("contenedor-unidades");
+        const res = await listarUnidades(materiaId);
+
+        if (!res.ok) {
+            cont.innerHTML = `<div class="alert alert-danger">${res.error}</div>`;
+            return;
+        }
+        if (res.unidades.length === 0) {
+            cont.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Esta materia aún no tiene contenido.</div>';
+            return;
+        }
+        cont.innerHTML = "";
+        res.unidades.forEach((u, i) => {
+            cont.innerHTML += renderizarUnidad(u, i);
+        });
+    }
+
+    // ---------- Cargar actividades y entregas ----------
+    async function cargarActividades(uid) {
+        const resA = await listarActividadesPorMateria(materiaId, true);
+        actividades = resA.ok ? resA.actividades : [];
+
+        const resE = await listarEntregasAlumnoMateria(uid, materiaId);
+        entregas = resE.ok ? resE.entregas : [];
+
+        pintarActividades();
+    }
+
+        // ---------- Pintar tarjetas de actividades ----------
+    function pintarActividades() {
+        const cont = document.getElementById("listaActividades");
+        const contador = document.getElementById("contadorActividades");
+
+        // Filtramos: Si la actividad está vencida Y ya tiene una entrega, la ocultamos.
+        // Si está vencida y NO tiene entrega, se queda visible.
+        const actividadesVisibles = actividades.filter((a) => {
+            const entrega = entregas.find((e) => e.actividadId === a.id);
+            const vencida = estaVencida(a);
+
+            if (vencida && entrega) {
+                return false; // Desaparece porque ya la entregó
+            }
+            return true; // Se muestra
+        });
+
+        contador.textContent = `${actividadesVisibles.length} actividad(es)`;
+
+        if (actividadesVisibles.length === 0) {
+            cont.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-info-circle me-1"></i>No hay actividades pendientes por ahora.</p>';
+            return;
+        }
+
+        cont.innerHTML = "";
+        // Cambiamos "actividades.forEach" por "actividadesVisibles.forEach"
+        actividadesVisibles.forEach((a) => {
+            const entrega = entregas.find((e) => e.actividadId === a.id);
+            const estado = obtenerEstado(a, entrega);
+            const vencida = estaVencida(a);
+            
+            // ... (El resto de tu código para generar la tarjeta sigue exactamente igual)
+
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-3 bg-white actividad-card";
+            div.style.cursor = "pointer";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div class="flex-grow-1 me-2">
+                        <h6 class="mb-1">${a.titulo || "Sin título"}</h6>
+                        <div class="text-muted small">
+                            <i class="fas fa-calendar me-1"></i> ${formatearFechaLimite(a)}
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-star me-1"></i> ${a.puntajeMaximo || 10} pts
+                            ${vencida ? '&nbsp;·&nbsp;<span class="text-danger"><i class="fas fa-clock me-1"></i>Vencida</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge ${estado.color} mb-1 d-block">${estado.label}</span>
+                        ${entrega && entrega.calificacion !== null && entrega.calificacion !== undefined
+                            ? `<small class="text-muted">${entrega.calificacion}/${a.puntajeMaximo}</small>`
+                            : ""}
+                    </div>
+                </div>
+            `;
+            div.addEventListener("click", () => abrirModalActividad(a.id));
+            cont.appendChild(div);
+        });
+    }
+
+    function obtenerEstado(actividad, entrega) {
+        if (!entrega) {
+            if (estaVencida(actividad)) return { label: "Sin entregar (vencida)", color: "bg-danger" };
+            return { label: "Sin entregar", color: "bg-warning text-dark" };
+        }
+        if (entrega.calificacion !== null && entrega.calificacion !== undefined) {
+            return { label: "Calificado", color: "bg-success" };
+        }
+        return { label: "Entregado", color: "bg-primary" };
+    }
+
+    // ---------- Modal ----------
+    function abrirModalActividad(actividadId) {
+        const a = actividades.find((x) => x.id === actividadId);
+        if (!a) return;
+
+        const entrega = entregas.find((e) => e.actividadId === actividadId);
+        document.getElementById("modalTitulo").textContent = a.titulo || "Actividad";
+
+        const body = document.getElementById("modalBody");
+        body.innerHTML = "";
+
+        // Encabezado con metadatos
+        const meta = document.createElement("div");
+        meta.className = "mb-3";
+        meta.innerHTML = `
+            <span class="badge bg-secondary me-1"><i class="fas fa-calendar me-1"></i>${formatearFechaLimite(a)}</span>
+            <span class="badge bg-info text-dark me-1"><i class="fas fa-star me-1"></i>${a.puntajeMaximo} pts</span>
+            ${estaVencida(a) ? '<span class="badge bg-danger"><i class="fas fa-clock me-1"></i>Fecha vencida</span>' : ""}
+        `;
+        body.appendChild(meta);
+
+        // Instrucciones (hoja)
+        const instrWrapper = document.createElement("div");
+        instrWrapper.innerHTML = renderHoja(a.instrucciones || {}, 0);
+        body.appendChild(instrWrapper);
+
+        // Recursos
+        if (Array.isArray(a.recursos) && a.recursos.length > 0) {
+            const tituloRec = document.createElement("h6");
+            tituloRec.className = "mt-4 mb-2";
+            tituloRec.innerHTML = '<i class="fas fa-paperclip me-1"></i> Recursos de apoyo';
+            body.appendChild(tituloRec);
+
+            const recWrapper = document.createElement("div");
+            recWrapper.innerHTML = renderRecursos(a.recursos);
+            body.appendChild(recWrapper);
+        }
+
+        // Estado actual de la entrega
+        if (entrega && entrega.calificacion !== null && entrega.calificacion !== undefined) {
+            const divCal = document.createElement("div");
+            divCal.className = "alert alert-success mt-4";
+            divCal.innerHTML = `
+                <h6 class="mb-2"><i class="fas fa-check-circle me-1"></i> Calificación: ${entrega.calificacion}/${a.puntajeMaximo}</h6>
+                ${entrega.comentarioProfesor
+                    ? `<div class="mt-2"><strong>Retroalimentación del profesor:</strong><br>${entrega.comentarioProfesor}</div>`
+                    : ""}
+                <div class="mt-3">
+                    <strong>Archivos entregados:</strong>
+                    <ul class="mb-0">
+                        ${(entrega.archivos || []).map((f) =>
+                            `<li><a href="${f.url}" target="_blank" rel="noopener">${f.nombre}</a></li>`
+                        ).join("")}
+                    </ul>
+                </div>
+            `;
+            body.appendChild(divCal);
+        } else if (entrega) {
+            // Ya entregó pero no está calificado → mostrar entrega + permitir reemplazo
+            const divEnt = document.createElement("div");
+            divEnt.className = "alert alert-primary mt-4";
+            divEnt.innerHTML = `
+                <h6 class="mb-2"><i class="fas fa-paper-plane me-1"></i> Tu entrega actual</h6>
+                <div class="small text-muted mb-2">
+                    Entregado: ${formatearFecha(entrega.fechaEntrega)}
+                </div>
+                <ul class="mb-0">
+                    ${(entrega.archivos || []).map((f) =>
+                        `<li><a href="${f.url}" target="_blank" rel="noopener">${f.nombre}</a></li>`
+                    ).join("")}
+                </ul>
+                ${entrega.comentarioAlumno
+                    ? `<div class="mt-2"><strong>Tu comentario:</strong> ${entrega.comentarioAlumno}</div>`
+                    : ""}
+                <div class="mt-3 small text-muted">
+                    <i class="fas fa-info-circle me-1"></i>Puedes reemplazar tus archivos mientras el profesor no califique.
+                </div>
+            `;
+            body.appendChild(divEnt);
+        }
+
+        // Formulario (si no está calificado)
+        if (!entrega || entrega.calificacion === null || entrega.calificacion === undefined) {
+            const formWrapper = document.createElement("div");
+            formWrapper.className = "mt-4 border-top pt-3";
+            formWrapper.innerHTML = `
+                <h6><i class="fas fa-upload me-1"></i> ${entrega ? "Reemplazar entrega" : "Subir mi entrega"}</h6>
+                <p class="small text-muted">
+                    Formatos permitidos: <strong>${(a.tiposPermitidos || []).join(", ")}</strong><br>
+                    Sube tus archivos a Google Drive, compártelos como "Cualquiera con el enlace" y pega el enlace aquí.
+                </p>
+                <div id="archivosContainer"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="btnAddArchivo">
+                    <i class="fas fa-plus"></i> Agregar otro archivo
+                </button>
+                <div class="mt-3">
+                    <label class="form-label small">Comentario para el profesor (opcional)</label>
+                    <textarea class="form-control" id="comentarioAlumno" rows="2"
+                              placeholder="Ej: Adjunto también un mapa mental de apoyo...">${entrega?.comentarioAlumno || ""}</textarea>
+                </div>
+                <button type="button" class="btn btn-primary mt-3" id="btnEntregar">
+                    <i class="fas fa-paper-plane me-1"></i> ${entrega ? "Reemplazar entrega" : "Entregar actividad"}
+                </button>
+                <div id="mensajeEntrega" class="mt-2" style="display:none;"></div>
+            `;
+            body.appendChild(formWrapper);
+
+            // Archivos iniciales
+            const archivosIniciales = entrega?.archivos?.length
+                ? JSON.parse(JSON.stringify(entrega.archivos))
+                : [{ nombre: "", url: "" }];
+            pintarArchivosInputs(archivosIniciales);
+
+            // Listener para agregar otro archivo
+            document.getElementById("btnAddArchivo").addEventListener("click", () => {
+                const lista = leerArchivosInputs();
+                lista.push({ nombre: "", url: "" });
+                pintarArchivosInputs(lista);
+            });
+
+            // Listener de entrega
+            document.getElementById("btnEntregar").addEventListener("click", async () => {
+                const archivos = leerArchivosInputs().filter((x) => x.nombre && x.url);
+                if (archivos.length === 0) {
+                    alert("Agrega al menos un archivo con nombre y URL");
+                    return;
+                }
+
+                const comentario = document.getElementById("comentarioAlumno").value.trim();
+                const btn = document.getElementById("btnEntregar");
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...';
+
+                const res = await guardarEntrega({
+                    actividadId: a.id,
+                    materiaId,
+                    materiaNombre: materiaActual.nombre, 
+                    actividadTitulo: a.titulo,           
+                    archivos,
+                    comentarioAlumno: comentario
+                });
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> ' + (entrega ? "Reemplazar entrega" : "Entregar actividad");
+
+                if (res.ok) {
+                    alert("✅ Entrega guardada correctamente");
+                    await cargarActividades(alumnoUid);
+                    bootstrap.Modal.getInstance(document.getElementById("modalActividad")).hide();
+                } else {
+                    alert("❌ " + res.error);
+                }
+            });
+        }
+
+        // Mostrar modal
+        if (!modalBootstrap) {
+            modalBootstrap = new bootstrap.Modal(document.getElementById("modalActividad"));
+        }
+        modalBootstrap.show();
+    }
+
+    // ---------- Renderizar recursos ----------
+    function renderRecursos(recursos) {
+        let html = '<div class="row g-3">';
+        recursos.forEach((r) => {
+            if (r.tipo === "video") {
+                html += `
+                    <div class="col-12">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="${normalizarUrlVideo(r.url)}" allowfullscreen></iframe>
+                        </div>
+                        ${r.descripcion ? `<p class="small text-muted mt-1 mb-0">${r.descripcion}</p>` : ""}
+                    </div>`;
+            } else if (r.tipo === "imagen") {
+                html += `
+                    <div class="col-md-6">
+                        <img src="${convertirUrlImagen(r.url)}" class="img-fluid rounded shadow-sm" alt="${r.descripcion || "Imagen"}">
+                        ${r.descripcion ? `<p class="small text-muted mt-1 mb-0">${r.descripcion}</p>` : ""}
+                    </div>`;
+            } else {
+                html += `
+                    <div class="col-12">
+                        <a href="${r.url}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-pdf me-1"></i> ${r.descripcion || "Abrir PDF"}
+                        </a>
+                    </div>`;
+            }
+        });
+        html += "</div>";
+        return html;
+    }
+
+    // ---------- Inputs de archivos ----------
+    function pintarArchivosInputs(lista) {
+        const cont = document.getElementById("archivosContainer");
+        if (!cont) return;
+
+        if (lista.length === 0) lista.push({ nombre: "", url: "" });
+
+        cont.innerHTML = "";
+        lista.forEach((a, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-2 mb-2 bg-light archivo-row";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="small">Archivo ${i + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-archivo">×</button>
+                </div>
+                <input class="form-control form-control-sm mb-1 inp-archivo-nombre" placeholder="Nombre del archivo (ej: ensayo.pdf)" value="${a.nombre || ""}">
+                <input class="form-control form-control-sm inp-archivo-url" placeholder="Enlace de Drive (público)" value="${a.url || ""}">
+            `;
+            cont.appendChild(div);
+        });
+
+        cont.querySelectorAll(".btn-quitar-archivo").forEach((b) => {
+            b.addEventListener("click", () => {
+                const lista = leerArchivosInputs();
+                const idx = Array.from(cont.children).indexOf(b.closest(".archivo-row"));
+                lista.splice(idx, 1);
+                pintarArchivosInputs(lista);
+            });
+        });
+    }
+
+    function leerArchivosInputs() {
+        const cont = document.getElementById("archivosContainer");
+        const out = [];
+        if (!cont) return out;
+        cont.querySelectorAll(".archivo-row").forEach((row) => {
+            out.push({
+                nombre: row.querySelector(".inp-archivo-nombre").value.trim(),
+                url:    row.querySelector(".inp-archivo-url").value.trim()
+            });
+        });
+        return out;
+    }
+
+    // ---------- Helper fecha ----------
+    function formatearFecha(ts) {
+        if (!ts) return "—";
+        try {
+            const d = ts.toDate ? ts.toDate() : new Date(ts.seconds * 1000);
+            return d.toLocaleString("es-MX", {
+                day: "2-digit", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit"
+            });
+        } catch (_) { return "—"; }
+    }
+</script>
+
+</body>
+</html>

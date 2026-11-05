@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisar Entregas - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · REVISAR ENTREGAS</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="actividades.html">
+            <i class="fas fa-arrow-left"></i> Volver a actividades
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                
+                <!-- Barra de búsqueda existente -->
+                <li class="nav-item me-3">
+                    <form class="d-flex" onsubmit="event.preventDefault(); window.location.href='../pages/buscar.html?q=' + encodeURIComponent(this.buscar.value);">
+                        <input type="text" name="buscar" class="form-control form-control-sm" placeholder="Buscar..." style="width:180px;">
+                    </form>
+                </li>
+
+                <!-- NUEVO BOTÓN VOLVER (Mismo estilo que Cerrar Sesión) -->
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="#" id="btnVolverPanel">
+                        <i class="fas fa-arrow-left"></i> Volver al Panel
+                    </a>
+                </li>
+
+                <!-- Botón Cerrar Sesión existente -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Selectores -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label"><strong>1. Selecciona una materia</strong></label>
+                    <select class="form-select" id="selectorMateria">
+                        <option value="">Cargando materias...</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"><strong>2. Selecciona la actividad</strong></label>
+                    <select class="form-select" id="selectorActividad" disabled>
+                        <option value="">Primero elige una materia...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de entregas -->
+    <div class="card" id="panelTabla" style="display:none;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span id="tituloActividad"><i class="fas fa-clipboard-list me-2"></i> —</span>
+            <span class="badge bg-info text-dark" id="infoEntregas">0 entregas</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Alumno</th>
+                            <th>Estado</th>
+                            <th>Calificación</th>
+                            <th style="width:130px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaEntregas">
+                        <tr><td colspan="4" class="text-center text-muted py-4">Selecciona una actividad.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Revisar Entregas
+    </div>
+</footer>
+
+<!-- Modal para calificar -->
+<div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitulo">Calificar Entrega</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, observarSesion } from "../js/auth.js";
+    import { listarMaterias } from "../js/materias.js";
+    import { listarUsuarios } from "../js/usuarios.js";
+    import {
+        listarActividadesPorMateria, listarEntregasPorActividad,
+        calificarEntrega, obtenerActividad
+    } from "../js/actividades.js";
+
+    // Solo staff
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) { window.location.href = "../index.html"; return; }
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // ---------- Estado ----------
+    let materiaId = null;
+    let actividadId = null;
+    let actividadActual = null;
+    let alumnos = [];
+    let entregas = [];
+    let modalBootstrap = null;
+
+    // ---------- Cargar materias ----------
+    async function cargarMaterias() {
+        const sel = document.getElementById("selectorMateria");
+        const res = await listarMaterias();
+        if (!res.ok) { sel.innerHTML = `<option>Error</option>`; return; }
+        
+        sel.innerHTML = '<option value="">— Selecciona una materia —</option>';
+        res.materias.forEach((m) => {
+            sel.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+        });
+    }
+
+    // ---------- Cambio de materia ----------
+    document.getElementById("selectorMateria").addEventListener("change", async (e) => {
+        materiaId = e.target.value;
+        const selAct = document.getElementById("selectorActividad");
+        
+        if (!materiaId) {
+            selAct.innerHTML = '<option value="">Primero elige una materia...</option>';
+            selAct.disabled = true;
+            document.getElementById("panelTabla").style.display = "none";
+            return;
+        }
+
+        selAct.innerHTML = '<option>Cargando actividades...</option>';
+        selAct.disabled = true;
+
+        const res = await listarActividadesPorMateria(materiaId, false);
+        if (!res.ok || res.actividades.length === 0) {
+            selAct.innerHTML = '<option value="">No hay actividades en esta materia</option>';
+            return;
+        }
+
+        selAct.innerHTML = '<option value="">— Selecciona una actividad —</option>';
+        res.actividades.forEach((a) => {
+            selAct.innerHTML += `<option value="${a.id}">${a.titulo}</option>`;
+        });
+        selAct.disabled = false;
+    });
+
+    // ---------- Cambio de actividad ----------
+    document.getElementById("selectorActividad").addEventListener("change", async (e) => {
+        actividadId = e.target.value;
+        if (!actividadId) {
+            document.getElementById("panelTabla").style.display = "none";
+            return;
+        }
+
+        document.getElementById("panelTabla").style.display = "block";
+        document.getElementById("tablaEntregas").innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Cargando entregas...</td></tr>';
+
+        // Cargar datos en paralelo
+        const [resAct, resUsers, resEntregas] = await Promise.all([
+            obtenerActividad(actividadId),
+            listarUsuarios(),
+            listarEntregasPorActividad(actividadId)
+        ]);
+
+        if (resAct.ok) {
+            actividadActual = resAct.actividad;
+            document.getElementById("tituloActividad").innerHTML = 
+                `<i class="fas fa-clipboard-list me-2"></i> ${actividadActual.titulo} <small class="text-muted ms-2">(Máx: ${actividadActual.puntajeMaximo} pts)</small>`;
+        }
+
+        if (!resUsers.ok) {
+            document.getElementById("tablaEntregas").innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar alumnos</td></tr>';
+            return;
+        }
+
+        // Filtrar solo alumnos que tienen esta materia
+        alumnos = resUsers.usuarios.filter(
+            (u) => u.rol === "alumno" && (u.materiasAsignadas || []).includes(materiaId)
+        );
+
+        entregas = resEntregas.ok ? resEntregas.entregas : [];
+        document.getElementById("infoEntregas").textContent = `${entregas.length} entrega(s) / ${alumnos.length} alumno(s)`;
+
+        pintarTabla();
+    });
+
+    // ---------- Pintar tabla ----------
+    function pintarTabla() {
+        const tbody = document.getElementById("tablaEntregas");
+        
+        if (alumnos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay alumnos inscritos en esta materia.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        alumnos.forEach((a) => {
+            const entrega = entregas.find((e) => e.alumnoUid === a.uid);
+            
+            let estadoBadge = '<span class="badge bg-secondary">Sin entregar</span>';
+            let notaTexto = "—";
+            let btnAccion = `<button class="btn btn-sm btn-outline-secondary" disabled>Sin entrega</button>`;
+
+            if (entrega) {
+                if (entrega.calificacion !== null && entrega.calificacion !== undefined) {
+                    estadoBadge = '<span class="badge bg-success">Calificado</span>';
+                    notaTexto = `<strong class="text-success">${entrega.calificacion} / ${actividadActual.puntajeMaximo}</strong>`;
+                    btnAccion = `<button class="btn btn-sm btn-outline-primary btn-calificar" data-uid="${a.uid}">Ver / Editar</button>`;
+                } else {
+                    estadoBadge = '<span class="badge bg-warning text-dark">Por calificar</span>';
+                    notaTexto = "—";
+                    btnAccion = `<button class="btn btn-sm btn-primary btn-calificar" data-uid="${a.uid}">Calificar</button>`;
+                }
+            }
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <strong>${a.nombre || "—"}</strong><br>
+                    <small class="text-muted">${a.email}</small>
+                </td>
+                <td>${estadoBadge}</td>
+                <td>${notaTexto}</td>
+                <td>${btnAccion}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Listeners de calificar
+        tbody.querySelectorAll(".btn-calificar").forEach((btn) => {
+            btn.addEventListener("click", () => abrirModalCalificar(btn.dataset.uid));
+        });
+    }
+
+    // ---------- Modal Calificar ----------
+    function abrirModalCalificar(alumnoUid) {
+        const alumno = alumnos.find((a) => a.uid === alumnoUid);
+        const entrega = entregas.find((e) => e.alumnoUid === alumnoUid);
+        if (!alumno || !entrega) return;
+
+        document.getElementById("modalTitulo").textContent = `Calificar: ${alumno.nombre}`;
+
+        const body = document.getElementById("modalBody");
+        
+        // Generar vista previa de archivos
+        const archivosHtml = (entrega.archivos || []).map((f) => {
+            let preview = "";
+            const url = f.url || "";
+            const esImagen = url.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i) || url.includes("i.ibb.co") || url.includes("imgur");
+            const esDrive = url.includes("drive.google.com");
+            
+            // Si es imagen directa o de ImgBB
+            if (esImagen && !esDrive) {
+                preview = `<img src="${url}" class="img-fluid rounded mb-2" style="max-height: 200px; object-fit: contain;">`;
+            } 
+            // Si es un PDF de Drive
+            else if (esDrive) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    const driveId = match[1];
+                    preview = `
+                        <div class="ratio ratio-16x9 mb-2" style="max-width: 400px;">
+                            <iframe src="https://drive.google.com/file/d/${driveId}/preview" allow="autoplay"></iframe>
+                        </div>`;
+                }
+            }
+
+            return `
+                <li class="mb-4 border-bottom pb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong><i class="fas fa-file-alt text-primary me-2"></i>${f.nombre}</strong>
+                        <a href="${url}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-external-link-alt"></i> Abrir original
+                        </a>
+                    </div>
+                    ${preview}
+                    <div class="small text-muted text-break">${url}</div>
+                </li>
+            `;
+        }).join("");
+
+        // Inyectar HTML al modal
+        body.innerHTML = `
+            <div class="mb-4">
+                <h6><i class="fas fa-paperclip me-2"></i> Archivos entregados</h6>
+                <ul class="list-unstyled border rounded p-3 bg-light">
+                    ${archivosHtml || "<li>No hay archivos</li>"}
+                </ul>
+            </div>
+            
+            ${entrega.comentarioAlumno ? `
+            <div class="mb-4">
+                <h6><i class="fas fa-comment me-2"></i> Comentario del alumno</h6>
+                <div class="border rounded p-3 bg-light text-muted">${entrega.comentarioAlumno}</div>
+            </div>` : ""}
+
+            <hr>
+
+            <form id="formCalificar">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Calificación (0 - ${actividadActual.puntajeMaximo}) *</label>
+                        <input type="number" class="form-control" id="inputCalificacion" 
+                               min="0" max="${actividadActual.puntajeMaximo}" step="0.1" required
+                               value="${entrega.calificacion !== null ? entrega.calificacion : ""}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Retroalimentación (opcional)</label>
+                        <textarea class="form-control" id="inputRetro" rows="4" 
+                                  placeholder="Comentarios para el alumno...">${entrega.comentarioProfesor || ""}</textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success" id="btnGuardarCal">
+                            <i class="fas fa-save me-1"></i> Guardar calificación
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+        // Listener guardar (Asignado de forma segura después de inyectar el HTML)
+        document.getElementById("formCalificar").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btnGuardarCal");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const nota = Number(document.getElementById("inputCalificacion").value);
+            const retro = document.getElementById("inputRetro").value.trim();
+
+            const res = await calificarEntrega({
+                actividadId,
+                alumnoUid,
+                calificacion: nota,
+                comentarioProfesor: retro
+            });
+
+            if (res.ok) {
+                // Actualizar estado local
+                const idx = entregas.findIndex((e) => e.alumnoUid === alumnoUid);
+                if (idx >= 0) {
+                    entregas[idx].calificacion = nota;
+                    entregas[idx].comentarioProfesor = retro;
+                    entregas[idx].estado = "calificado";
+                }
+                pintarTabla();
+                bootstrap.Modal.getInstance(document.getElementById("modalCalificar")).hide();
+            } else {
+                alert("Error: " + res.error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-1"></i> Guardar calificación';
+            }
+        });
+
+        if (!modalBootstrap) {
+            modalBootstrap = new bootstrap.Modal(document.getElementById("modalCalificar"));
+        }
+        modalBootstrap.show();
+    }
+
+      // Lógica para el botón "Volver al Panel"
+    document.getElementById("btnVolverPanel").addEventListener("click", (e) => {
+        e.preventDefault();
+        observarSesion(({ logueado, rol }) => {
+            if (logueado && rol === "supervisor") {
+                window.location.href = "../supervisor/dashboard.html";
+            } else if (logueado && rol === "admin") {
+                window.location.href = "dashboard-admin.html";
+            } else {
+                window.location.href = "../index.html"; // Por si la sesión expiró
+            }
+        });
+    });
+
+    // Inicial
+    cargarMaterias();
+</script>
+
+</body>
+</html>

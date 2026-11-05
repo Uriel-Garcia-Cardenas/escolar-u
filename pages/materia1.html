@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informática I - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script> <!-- Carga tus llaves -->
+    <script src="../js/main.js"></script>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title">ESCOLAR_U</h1>
+            <p class="site-tagline">Plataforma educativa · Conocimiento sin límites</p>
+        </div>
+    </header>
+     <nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="inicio.html">
+            <i class="fas fa-home"></i> Inicio
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <!-- Materias -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="materiasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Materias
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="materiasDropdown">
+                        <li><a class="dropdown-item" href="materia1.html">Informática I</a></li>
+                        <li><a class="dropdown-item" href="materia2.html">Programación Visual</a></li>
+                        <li><a class="dropdown-item" href="materia3.html">Programación Aplicada a la Ingeniería</a></li>
+                        <li><a class="dropdown-item" href="materia4.html">Computación para Ingeniería</a></li>
+                        <li><a class="dropdown-item" href="materia5.html">Seguridad Informática</a></li>
+                        <li><a class="dropdown-item" href="materia6.html">Tópicos Selectos de Informática</a></li>
+                        <li><a class="dropdown-item" href="materia7.html">Comercio Electrónico</a></li>
+                        <li><a class="dropdown-item" href="materia8.html">Análisis de Redes de Datos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#contactoModal">Contacto</a>
+                </li>
+               
+            </ul>
+        </div>
+    </div>
+</nav>
+    <div class="modal fade" id="contactoModal" tabindex="-1" aria-labelledby="contactoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white" style="background-color: var(--azul-oscuro) !important;">
+                    <h5 class="modal-title" id="contactoModalLabel"><i class="fas fa-chalkboard-teacher me-2"></i> Contacto Profesora Liana López</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-user-graduate me-2"></i> Profesora</h5>
+                                <p class="mb-0"><strong>LIANA LOPEZ PACHECO</strong></p>
+                                <hr>
+                                <h5><i class="fas fa-envelope me-2"></i> Correo</h5>
+                                <p><a href="mailto:lizli_lopez@hotmail.com">lizli_lopez@hotmail.com</a></p>
+                                <h5><i class="fab fa-facebook me-2"></i> Facebook</h5>
+                                <p><a href="https://facebook.com/prof.liana" target="_blank">@prof.Liana</a></p>
+                                <h5><i class="fas fa-phone me-2"></i> Teléfono</h5>
+                                <p>+52 55 66 78 78 78</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-clock me-2"></i> Horario de Oficina</h5>
+                                <p><strong>Lunes a Viernes:</strong> 16:00 - 18:00 hrs</p>
+                                <p><small class="text-muted">Disponible para dudas y asesorías previa cita.</small></p>
+                                <hr>
+                                <h5><i class="fas fa-calendar-alt me-2"></i> Atención en línea</h5>
+                                <p>Plataforma Teams / Google Meet con cita previa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="mt-3 mb-3 text-center"><i class="fas fa-table-list me-2"></i> Horario de Clases (Lunes a Viernes)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Horario</th>
+                                    <th>Materia</th>
+                                    <th>Aula </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Lunes</strong></td>
+                                    <td>10:00 - 12:00</td>
+                                    <td>Informática I</td>
+                                    <td>A14 111 </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Miércoles</strong></td>
+                                    <td>10:00 - 12:00</td>
+                                    <td>Informática I</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i> Las demás materias (Computación para Ingeniería, Seguridad Informática, Tópicos Selectos, Comercio Electrónico, Análisis de Redes) se imparten en horarios flexibles según programación. Consulte el calendario de cada materia dentro de la plataforma.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1>Informática I: Introducción a la Informática</h1>
+                <hr>
+            </div>
+        </div>
+<div class="row mb-4">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h3 class="h5 mb-0">Objetivo general</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Al finalizar el curso el alumno contará con un panorama de los conceptos, principios y teorías fundamentales de la informática y la computación, así como su proyección social.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h3 class="h5 mb-0">Contenido temático</h3>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Unidad 1:</strong> Antecedentes históricos de la Informática y la Computación.</li>
+                    <li><strong>Unidad 2:</strong> Fundamentos de la Informática y computación.</li>
+                    <li><strong>Unidad 3:</strong> Redes y comunicación de datos.</li>
+                    <li><strong>Unidad 4:</strong> Tecnologías de la Información y la comunicación.</li>
+                    <li><strong>Unidad 5:</strong> Proyección de la Informática.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0"> Unidad 1: Antecedentes históricos de la Informática y la Computación</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Esta unidad explora los orígenes y la evolución de la computación, desde los primeros dispositivos de cálculo hasta las primeras computadoras electrónicas. Se analizan los inventos clave y los pioneros que sentaron las bases de la informática moderna.</p>
+                        
+                        <div class="accordion" id="accordionUnidad1">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        1.1 Precursores: del ábaco a las máquinas mecánicas
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionUnidad1">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Ábaco (3000 a.C.):</strong> Primer instrumento manual para operaciones aritméticas.</li>
+                                            <li><strong>Regla de cálculo (siglo XVII):</strong> Instrumento analógico basado en logaritmos.</li>
+                                            <li><strong>Pascalina (1642):</strong> Blaise Pascal inventó la primera calculadora mecánica.</li>
+                                            <li><strong>Máquina de Leibniz (1673):</strong> Gottfried Leibniz añadió multiplicación y división.</li>
+                                            <li><strong>Telar de Jacquard (1801):</strong> Uso de tarjetas perforadas, precursor de la programación.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        1.2 Charles Babbage y la Máquina Analítica
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionUnidad1">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Máquina Diferencial (1822):</strong> Para calcular tablas de polinomios.</li>
+                                            <li><strong>Máquina Analítica (1837):</strong> Primer diseño de computadora de propósito general.</li>
+                                            <li><strong>Ada Lovelace:</strong> Primera programadora de la historia.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        1.3 Alan Turing y la Máquina de Turing
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionUnidad1">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Máquina de Turing (1936):</strong> Modelo teórico que define la computabilidad.</li>
+                                            <li><strong>Test de Turing:</strong> Para evaluar inteligencia artificial.</li>
+                                            <li><strong>Descifrado de Enigma:</strong> Contribución crucial en la Segunda Guerra Mundial.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        1.4 Primera generación: ENIAC, EDVAC y UNIVAC
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionUnidad1">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>ENIAC (1946):</strong> Primera computadora electrónica de propósito general.</li>
+                                            <li><strong>EDVAC (1949):</strong> Arquitectura de von Neumann (programa almacenado).</li>
+                                            <li><strong>UNIVAC I (1951):</strong> Primera computadora comercial.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                        1.5 Evolución posterior: transistores, circuitos integrados y microprocesador
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionUnidad1">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Transistor (1947):</strong> Segunda generación, menor tamaño y mayor fiabilidad.</li>
+                                            <li><strong>Circuito integrado (1958):</strong> Tercera generación, miniaturización.</li>
+                                            <li><strong>Microprocesador (1971):</strong> Intel 4004, inicio de la era de las computadoras personales.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-muted small">Esta unidad sienta las bases para comprender la evolución tecnológica hasta los sistemas actuales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0">Video introductorio</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/o_78Ue_EUeI?list=PL2Z95CSZ1N4HLqf215jj9ZJgmWIXm7gOo" 
+                                    title="Video introductorio a Informática I" 
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                        <p class="mt-2 text-muted">Breve introducción a los temas que veremos en el curso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DESARROLLO DE LA UNIDAD 2 -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0"> Unidad 2: Fundamentos de la Informática y computación</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <p class="lead">En esta unidad se estudian los conceptos esenciales que conforman la base de la informática: hardware, software, representación de datos, arquitectura de computadoras y sistemas operativos.</p>
+                                <div class="accordion" id="accordionUnidad2">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="u2Heading1">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#u2Collapse1" aria-expanded="true" aria-controls="u2Collapse1">
+                                                2.1 Hardware: estructura y componentes
+                                            </button>
+                                        </h2>
+                                        <div id="u2Collapse1" class="accordion-collapse collapse show" aria-labelledby="u2Heading1" data-bs-parent="#accordionUnidad2">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li><strong>CPU (Unidad Central de Procesamiento):</strong> El cerebro de la computadora, ejecuta instrucciones.</li>
+                                                    <li><strong>Memoria RAM:</strong> Almacenamiento temporal de datos en ejecución.</li>
+                                                    <li><strong>Almacenamiento:</strong> Discos duros (HDD), unidades de estado sólido (SSD).</li>
+                                                    <li><strong>Periféricos:</strong> Dispositivos de entrada (teclado, ratón), salida (monitor, impresora) y mixtos.</li>
+                                                    <li><strong>Placa base:</strong> Conecta todos los componentes y permite la comunicación.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="u2Heading2">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#u2Collapse2" aria-expanded="false" aria-controls="u2Collapse2">
+                                                2.2 Software: clasificación y funciones
+                                            </button>
+                                        </h2>
+                                        <div id="u2Collapse2" class="accordion-collapse collapse" aria-labelledby="u2Heading2" data-bs-parent="#accordionUnidad2">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li><strong>Software de sistema:</strong> Sistemas operativos (Windows, Linux, macOS), controladores, utilidades.</li>
+                                                    <li><strong>Software de aplicación:</strong> Procesadores de texto, hojas de cálculo, navegadores, etc.</li>
+                                                    <li><strong>Software de desarrollo:</strong> Compiladores, editores de código, entornos integrados (IDE).</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="u2Heading3">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#u2Collapse3" aria-expanded="false" aria-controls="u2Collapse3">
+                                                2.3 Representación de la información
+                                            </button>
+                                        </h2>
+                                        <div id="u2Collapse3" class="accordion-collapse collapse" aria-labelledby="u2Heading3" data-bs-parent="#accordionUnidad2">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li><strong>Sistema binario:</strong> Base 2 (0 y 1), unidad mínima: bit.</li>
+                                                    <li><strong>Byte y múltiplos:</strong> Kilobyte, megabyte, gigabyte.</li>
+                                                    <li><strong>Códigos de caracteres:</strong> ASCII, Unicode.</li>
+                                                    <li><strong>Representación de números enteros y reales:</strong> Complemento a dos, punto flotante.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="u2Heading4">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#u2Collapse4" aria-expanded="false" aria-controls="u2Collapse4">
+                                                2.4 Arquitectura de computadoras
+                                            </button>
+                                        </h2>
+                                        <div id="u2Collapse4" class="accordion-collapse collapse" aria-labelledby="u2Heading4" data-bs-parent="#accordionUnidad2">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li><strong>Arquitectura de von Neumann:</strong> Unidad de control, ALU, memoria, buses.</li>
+                                                    <li><strong>Arquitectura Harvard:</strong> Memorias separadas para instrucciones y datos.</li>
+                                                    <li><strong>Ciclo de instrucción:</strong> Fetch, decode, execute.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="u2Heading5">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#u2Collapse5" aria-expanded="false" aria-controls="u2Collapse5">
+                                                2.5 Sistemas operativos: funciones y tipos
+                                            </button>
+                                        </h2>
+                                        <div id="u2Collapse5" class="accordion-collapse collapse" aria-labelledby="u2Heading5" data-bs-parent="#accordionUnidad2">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li><strong>Gestión de procesos:</strong> Planificación, concurrencia.</li>
+                                                    <li><strong>Gestión de memoria:</strong> Memoria virtual, paginación.</li>
+                                                    <li><strong>Sistemas de archivos:</strong> Organización y almacenamiento de datos.</li>
+                                                    <li><strong>Tipos:</strong> Monousuario/multiusuario, tiempo real, embebidos.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="video-sidebar">
+                                    <h4 class="h6 mb-3">Video: Fundamentos de la computación</h4>
+                                    <div class="ratio ratio-16x9 mb-2">
+                                        <iframe src="https://www.youtube.com/embed/o_78Ue_EUeI?list=PL2Z95CSZ1N4HLqf215jj9ZJgmWIXm7gOo" 
+                                                title="Fundamentos de la computación - Hardware y Software" 
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                    <p class="small text-muted mt-2">Explicación básica sobre hardware, software y cómo funciona una computadora.</p>
+                                    <p class="small text-muted">Complementa el estudio de la Unidad 2.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0">Unidad 3: Redes y comunicación de datos</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">Conceptos fundamentales sobre la interconexión de sistemas, modelos de comunicación, dispositivos y seguridad en redes.</p>
+                        <div class="hash-grid">
+                            <!-- Tarjeta 1: Conceptos básicos -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Conceptos básicos</h4>
+                                <p>Red, nodo, host, cliente-servidor, peer-to-peer. Clasificación por alcance: PAN, LAN, MAN, WAN.</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/3QhU9jd03a0" title="Introducción a redes" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 2: Topologías -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Topologías de red</h4>
+                                <p>Bus, estrella, anillo, malla, árbol, híbrida. Ventajas y desventajas de cada una.</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/zbqrNg4C98U" title="Topologías de red" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 3: Modelos OSI y TCP/IP -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Modelos OSI y TCP/IP</h4>
+                                <p>Capa física, enlace, red, transporte, sesión, presentación, aplicación. Comparativa con el modelo TCP/IP.</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/HEEnLZV2wGI" title="Modelo OSI" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 4: Dispositivos de red -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Dispositivos de red</h4>
+                                <p>NIC, switch, router, gateway, firewall, access point. Funciones y niveles de operación.</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/1z0ULvg_pW8" title="Dispositivos de red" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 5: Medios de transmisión -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Medios de transmisión</h4>
+                                <p>Cableado estructurado (UTP, fibra óptica) y medios inalámbricos (Wi-Fi, Bluetooth, satélite).</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/IlkDiTxNqWc" title="Medios de transmisión" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 6: Seguridad en redes -->
+                            <div class="hash-item">
+                                <div class="hash-icon">#</div>
+                                <h4 class="hash-title">Seguridad básica</h4>
+                                <p>Cifrado, firewalls, VPN, autenticación, políticas de seguridad, ataques comunes (DoS, phishing).</p>
+                                <div class="ratio ratio-16x9 mt-3">
+                                    <iframe src="https://www.youtube.com/embed/5kC5k5DqX1A" title="Seguridad en redes" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-4">Cada bloque contiene un video explicativo para reforzar los conceptos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>       
+                <!-- UNIDAD 4: Pestañas interactivas (diseño diferente) -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0"> Unidad 4: Tecnologías de la Información y la comunicación</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">Las TIC han transformado radicalmente nuestra forma de vivir, trabajar y relacionarnos. Explora cada tema a través de las siguientes secciones:</p>
+
+                        <!-- Tabs navigation -->
+                        <ul class="nav nav-tabs mb-4" id="unidad4Tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">Definición y evolución</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">Impacto social y económico</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab3" aria-selected="false">TIC en la educación</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab" aria-controls="tab4" aria-selected="false">E‑commerce y e‑government</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab" aria-controls="tab5" aria-selected="false">Tendencias tecnológicas</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab6-tab" data-bs-toggle="tab" data-bs-target="#tab6" type="button" role="tab" aria-controls="tab6" aria-selected="false">Ética y privacidad digital</button>
+                            </li>
+                        </ul>
+
+                        <!-- Content of tabs -->
+                        <div class="tab-content" id="unidad4TabContent">
+                            <!-- Tab 1: Definición y evolución -->
+                            <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Definición y evolución de las TIC</h4>
+                                        <p>Las Tecnologías de la Información y la Comunicación (TIC) agrupan todos los recursos necesarios para procesar, almacenar y transmitir información digital. Desde el telégrafo hasta el 5G, su evolución ha sido vertiginosa, convergiendo en ecosistemas digitales que hoy conectan al mundo.</p>
+                                        <ul>
+                                            <li><strong>Orígenes:</strong> Telegrafía (1837), teléfono (1876), radio (1895).</li>
+                                            <li><strong>Era digital:</strong> Computadoras personales, internet (1969-1990), web social (2000s).</li>
+                                            <li><strong>Actualidad:</strong> IoT, IA, computación en la nube, 5G.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/2NvJLk6Sd1E" title="Historia de las TIC" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tab 2: Impacto social y económico -->
+                            <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Impacto social y económico de las TIC</h4>
+                                        <p>Las TIC han generado una transformación profunda en todos los sectores. Han reducido la brecha de comunicación, pero también han creado nuevas desigualdades (brecha digital). En lo económico, impulsan la digitalización de empresas, el teletrabajo y nuevos modelos de negocio.</p>
+                                        <ul>
+                                            <li><strong>Positivo:</strong> Inclusión financiera, educación a distancia, democratización de la información.</li>
+                                            <li><strong>Desafíos:</strong> Desigualdad en el acceso, obsolescencia laboral, dependencia tecnológica.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/HVQv4cB1cKQ" title="Impacto de las TIC" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tab 3: TIC en la educación -->
+                            <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Las TIC en la educación</h4>
+                                        <p>El e-learning, las plataformas educativas, los recursos digitales y la gamificación han revolucionado la enseñanza. Los docentes se convierten en facilitadores, y los estudiantes en protagonistas activos de su aprendizaje.</p>
+                                        <ul>
+                                            <li>Plataformas como Moodle, Google Classroom, Canvas.</li>
+                                            <li>Recursos interactivos: videos, simuladores, realidad aumentada.</li>
+                                            <li>Habilidades digitales necesarias para el siglo XXI.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/7E3LpM9VpWc" title="TIC en educación" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tab 4: E‑commerce y e‑government -->
+                            <div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Comercio electrónico y gobierno electrónico</h4>
+                                        <p>El comercio electrónico (B2B, B2C, C2C) ha redefinido el mercado global. Por otro lado, el gobierno electrónico facilita trámites, promueve la transparencia y acerca los servicios públicos a los ciudadanos.</p>
+                                        <ul>
+                                            <li>Plataformas como Amazon, Mercado Libre, Alibaba.</li>
+                                            <li>Ejemplos de e-government: Declaración de impuestos en línea, identidad digital.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/Bf_0n8K2k1I" title="Comercio electrónico" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tab 5: Tendencias tecnológicas -->
+                            <div class="tab-pane fade" id="tab5" role="tabpanel" aria-labelledby="tab5-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Tendencias tecnológicas actuales</h4>
+                                        <p>El Internet de las Cosas (IoT), el Big Data, la inteligencia artificial, la computación en la nube y el 5G están configurando el futuro. Estas tecnologías se combinan para crear ciudades inteligentes, medicina personalizada y fábricas automatizadas.</p>
+                                        <ul>
+                                            <li><strong>IoT:</strong> Dispositivos conectados, hogares inteligentes.</li>
+                                            <li><strong>Big Data:</strong> Análisis masivo de datos para la toma de decisiones.</li>
+                                            <li><strong>IA:</strong> Asistentes virtuales, sistemas de recomendación.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/QSIPNhOiMoE" title="Tendencias TIC" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tab 6: Ética y privacidad digital -->
+                            <div class="tab-pane fade" id="tab6" role="tabpanel" aria-labelledby="tab6-tab">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h4>Ética y privacidad en el entorno digital</h4>
+                                        <p>Con el crecimiento de las TIC surgen dilemas éticos: protección de datos personales, ciberacoso, fake news, vigilancia masiva y responsabilidad de las plataformas. Regulaciones como el GDPR en Europa marcan un camino hacia una tecnología más respetuosa.</p>
+                                        <ul>
+                                            <li>Derecho al olvido, consentimiento informado.</li>
+                                            <li>Seguridad informática y prevención de delitos digitales.</li>
+                                            <li>Responsabilidad social de empresas tecnológicas.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/5oR9AJuNk-Q" title="Ética digital" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-4">Haz clic en cada pestaña para explorar los diferentes aspectos de las TIC.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- UNIDAD 5: Línea de tiempo vertical (diseño diferente) -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0"> Unidad 5: Proyección de la Informática</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">La informática no es estática; evoluciona constantemente y su proyección abarca nuevas tecnologías, perfiles profesionales y transformaciones sociales. A continuación, recorremos los hitos futuros y las áreas de impacto.</p>
+
+                        <!-- Timeline vertical -->
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon">1</div>
+                                <div class="timeline-content">
+                                    <h4> Tendencias emergentes</h4>
+                                    <p>Inteligencia artificial generativa, computación cuántica, realidad extendida (XR), blockchain, edge computing y 6G. Estas tecnologías redefinirán industrias y la interacción humano-máquina.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">2</div>
+                                <div class="timeline-content">
+                                    <h4> Perfiles profesionales del futuro</h4>
+                                    <p>Especialistas en ciberseguridad, científicos de datos, arquitectos de IA, desarrolladores de realidad mixta, ingenieros de IoT y expertos en ética digital. La demanda crece exponencialmente.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">3</div>
+                                <div class="timeline-content">
+                                    <h4> Ciudades inteligentes y sostenibilidad</h4>
+                                    <p>La informática aplicada a la gestión urbana (smart cities) optimiza recursos, movilidad y servicios públicos. También contribuye al desarrollo sostenible mediante soluciones de eficiencia energética.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">4</div>
+                                <div class="timeline-content">
+                                    <h4> Ética, regulación y gobernanza digital</h4>
+                                    <p>Marcos legales para la IA, protección de datos, soberanía tecnológica y prevención de sesgos algorítmicos serán pilares fundamentales en la próxima década.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">5</div>
+                                <div class="timeline-content">
+                                    <h4> Impacto social y retos globales</h4>
+                                    <p>La informática puede ayudar a resolver problemas como el cambio climático, la salud pública, la educación inclusiva y la reducción de brechas digitales. La responsabilidad social será clave.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Video final de reflexión -->
+                        <div class="mt-5 pt-3">
+                            <h5 class="mb-3"> Video: El futuro de la informática</h5>
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/hwwyU4BvQWQ" title="El futuro de la informática" allowfullscreen></iframe>
+                            </div>
+                            <p class="text-muted small mt-2">Una mirada a cómo la tecnología transformará nuestras vidas en los próximos años.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- UNIDAD 6: Tarjetas flip (ciberseguridad) -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0"> Unidad 6: Seguridad Informática y Ciberseguridad</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">La seguridad informática protege la integridad, confidencialidad y disponibilidad de la información. Conoce las principales amenazas y las mejores prácticas para mitigarlas.</p>
+                        
+                        <!-- Grid de tarjetas flip -->
+                        <div class="flip-grid">
+                            <!-- Tarjeta 1: Malware -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">🦠</div>
+                                        <h4>Malware</h4>
+                                        <p>Software malicioso que daña sistemas o roba información.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>Tipos de Malware</h5>
+                                        <ul>
+                                            <li><strong>Virus:</strong> Se replica adjuntándose a archivos.</li>
+                                            <li><strong>Gusanos:</strong> Se propagan por redes sin intervención.</li>
+                                            <li><strong>Troyanos:</strong> Suplantan software legítimo.</li>
+                                            <li><strong>Ransomware:</strong> Bloquea datos y exige rescate.</li>
+                                            <li><strong>Spyware:</strong> Espía actividades del usuario.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 2: Phishing -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">🎣</div>
+                                        <h4>Phishing</h4>
+                                        <p>Suplantación de identidad para obtener datos sensibles.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>¿Cómo detectarlo?</h5>
+                                        <ul>
+                                            <li>Correos con remitente sospechoso.</li>
+                                            <li>URLs que no coinciden con el sitio oficial.</li>
+                                            <li>Solicitudes urgentes de información personal.</li>
+                                            <li>Ofertas demasiado atractivas.</li>
+                                        </ul>
+                                        <p class="mt-2">Nunca hagas clic en enlaces sospechosos; verifica siempre la fuente.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 3: Firewall y redes seguras -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">🔥</div>
+                                        <h4>Firewall</h4>
+                                        <p>Sistema que controla el tráfico de red basado en reglas.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>Funciones clave</h5>
+                                        <ul>
+                                            <li>Bloquea accesos no autorizados.</li>
+                                            <li>Filtra paquetes según IP, puerto o protocolo.</li>
+                                            <li>Puede ser hardware o software.</li>
+                                            <li>Complemento con IDS/IPS (detección/prevención de intrusiones).</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 4: Autenticación y contraseñas -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">🔑</div>
+                                        <h4>Autenticación</h4>
+                                        <p>Mecanismos para verificar la identidad de un usuario.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>Buenas prácticas</h5>
+                                        <ul>
+                                            <li>Contraseñas largas y únicas.</li>
+                                            <li>Autenticación multifactor (MFA).</li>
+                                            <li>Biometría (huella, facial).</li>
+                                            <li>No reutilizar contraseñas.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 5: Copias de seguridad -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">💾</div>
+                                        <h4>Backup</h4>
+                                        <p>Copia de seguridad para recuperar datos ante incidentes.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>Estrategia 3-2-1</h5>
+                                        <ul>
+                                            <li><strong>3</strong> copias de los datos.</li>
+                                            <li><strong>2</strong> formatos de almacenamiento diferentes.</li>
+                                            <li><strong>1</strong> copia fuera del sitio (off-site).</li>
+                                        </ul>
+                                        <p class="mt-2">Realiza backups periódicos y prueba su restauración.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tarjeta 6: Ingeniería social -->
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-front">
+                                        <div class="flip-icon">🧠</div>
+                                        <h4>Ingeniería social</h4>
+                                        <p>Manipulación psicológica para obtener información.</p>
+                                    </div>
+                                    <div class="flip-back">
+                                        <h5>Ejemplos comunes</h5>
+                                        <ul>
+                                            <li>Llamadas telefónicas suplantando identidad.</li>
+                                            <li>Mensajes de texto con enlaces maliciosos (smishing).</li>
+                                            <li>Pretexting (falsas historias para obtener datos).</li>
+                                        </ul>
+                                        <p>La mejor defensa es la formación y el escepticismo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Video de refuerzo -->
+                        <div class="mt-5">
+                            <h5 class="mb-3">🎥 Video: Fundamentos de ciberseguridad</h5>
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/inWWhr5tnEA" title="Ciberseguridad básica" allowfullscreen></iframe>
+                            </div>
+                            <p class="text-muted small mt-2">Conceptos esenciales para proteger tus dispositivos y datos.</p>
+                        </div>
+
+                        <!-- Lista de buenas prácticas -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h5>✅ Buenas prácticas de seguridad</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul>
+                                        <li>Mantén el software actualizado.</li>
+                                        <li>Usa antivirus y firewall activos.</li>
+                                        <li>Desconfía de correos no solicitados.</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul>
+                                        <li>Cifra información sensible.</li>
+                                        <li>Configura privacidad en redes sociales.</li>
+                                        <li>Educa a tu equipo sobre riesgos.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <!-- UNIDAD 7: Pantalla dividida con acordeones (IA) -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0">🤖 Unidad 7: Inteligencia Artificial y su Impacto</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">La inteligencia artificial (IA) está transformando todos los ámbitos de la sociedad. Esta unidad explora sus fundamentos, aplicaciones y desafíos éticos.</p>
+                        
+                        <div class="row g-4">
+                            <!-- Columna izquierda: contenido extenso -->
+                            <div class="col-lg-7">
+                                <h4>¿Qué es la inteligencia artificial?</h4>
+                                <p>La IA es la capacidad de las máquinas para realizar tareas que normalmente requieren inteligencia humana: aprendizaje, razonamiento, percepción, toma de decisiones. Se divide en IA débil (específica) e IA fuerte (general, aún teórica).</p>
+                                <p>Sus ramas principales incluyen el aprendizaje automático (machine learning), el aprendizaje profundo (deep learning), el procesamiento del lenguaje natural y la visión por computadora.</p>
+                                
+                                <div class="accordion" id="iaAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="iaHeading1">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#iaCollapse1" aria-expanded="true" aria-controls="iaCollapse1">
+                                                🧠 Aprendizaje automático (Machine Learning)
+                                            </button>
+                                        </h2>
+                                        <div id="iaCollapse1" class="accordion-collapse collapse show" aria-labelledby="iaHeading1" data-bs-parent="#iaAccordion">
+                                            <div class="accordion-body">
+                                                <p>Los algoritmos de ML aprenden patrones a partir de datos. Se clasifican en:</p>
+                                                <ul>
+                                                    <li><strong>Aprendizaje supervisado:</strong> Datos etiquetados (ej: clasificación de imágenes).</li>
+                                                    <li><strong>Aprendizaje no supervisado:</strong> Encuentra estructuras ocultas (ej: segmentación de clientes).</li>
+                                                    <li><strong>Aprendizaje por refuerzo:</strong> Aprende por prueba y error (ej: AlphaGo).</li>
+                                                </ul>
+                                                <p>Librerías populares: TensorFlow, PyTorch, Scikit-learn.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="iaHeading2">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#iaCollapse2" aria-expanded="false" aria-controls="iaCollapse2">
+                                                🌐 Procesamiento del lenguaje natural (NLP)
+                                            </button>
+                                        </h2>
+                                        <div id="iaCollapse2" class="accordion-collapse collapse" aria-labelledby="iaHeading2" data-bs-parent="#iaAccordion">
+                                            <div class="accordion-body">
+                                                <p>Permite a las máquinas entender y generar lenguaje humano. Aplicaciones:</p>
+                                                <ul>
+                                                    <li>Traductores automáticos (Google Translate).</li>
+                                                    <li>Asistentes virtuales (Siri, Alexa).</li>
+                                                    <li>Análisis de sentimientos en redes sociales.</li>
+                                                    <li>Modelos de lenguaje generativo (ChatGPT, Gemini).</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="iaHeading3">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#iaCollapse3" aria-expanded="false" aria-controls="iaCollapse3">
+                                                👁️ Visión por computadora
+                                            </button>
+                                        </h2>
+                                        <div id="iaCollapse3" class="accordion-collapse collapse" aria-labelledby="iaHeading3" data-bs-parent="#iaAccordion">
+                                            <div class="accordion-body">
+                                                <p>Las máquinas interpretan imágenes y videos. Usos:</p>
+                                                <ul>
+                                                    <li>Reconocimiento facial y de objetos.</li>
+                                                    <li>Vehículos autónomos.</li>
+                                                    <li>Diagnóstico médico por imágenes.</li>
+                                                    <li>Realidad aumentada.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="iaHeading4">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#iaCollapse4" aria-expanded="false" aria-controls="iaCollapse4">
+                                                ⚖️ Ética y desafíos de la IA
+                                            </button>
+                                        </h2>
+                                        <div id="iaCollapse4" class="accordion-collapse collapse" aria-labelledby="iaHeading4" data-bs-parent="#iaAccordion">
+                                            <div class="accordion-body">
+                                                <p>El avance de la IA plantea interrogantes:</p>
+                                                <ul>
+                                                    <li>Sesgos algorítmicos y discriminación.</li>
+                                                    <li>Privacidad de los datos.</li>
+                                                    <li>Desplazamiento laboral.</li>
+                                                    <li>Responsabilidad en decisiones autónomas.</li>
+                                                    <li>Regulación y gobernanza global.</li>
+                                                </ul>
+                                                <p>Iniciativas como la <em>Declaración de Montreal</em> y el <em>AI Act</em> de la UE buscan un desarrollo ético.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna derecha: info cards con videos -->
+                            <div class="col-lg-5">
+                                <div class="ia-sidebar">
+                                    <div class="ia-info-card">
+                                        <h5>📈 Hitos de la IA</h5>
+                                        <ul class="list-unstyled">
+                                            <li><strong>1956:</strong> Conferencia de Dartmouth – nacimiento de la IA.</li>
+                                            <li><strong>1997:</strong> Deep Blue vence a Kasparov en ajedrez.</li>
+                                            <li><strong>2012:</strong> AlexNet revoluciona visión por computadora.</li>
+                                            <li><strong>2016:</strong> AlphaGo derrota a campeón de Go.</li>
+                                            <li><strong>2023:</strong> Explosión de modelos generativos (GPT-4, etc.).</li>
+                                        </ul>
+                                    </div>
+                                    <div class="ia-info-card mt-4">
+                                        <h5>🎥 Video: Introducción a la IA</h5>
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="https://www.youtube.com/embed/2ePf9rue1Ao" title="¿Qué es la IA?" allowfullscreen></iframe>
+                                        </div>
+                                        <p class="small text-muted mt-2">Conceptos básicos y ejemplos cotidianos.</p>
+                                    </div>
+                                    <div class="ia-info-card mt-4">
+                                        <h5>📊 Datos impactantes</h5>
+                                        <ul>
+                                            <li>El mercado global de IA alcanzará los $1.8 billones en 2030.</li>
+                                            <li>El 77% de los dispositivos ya usan IA de alguna forma.</li>
+                                            <li>La IA puede aumentar la productividad hasta en un 40% en algunos sectores.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bibliografía -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h3 class="h5 mb-0">Bibliografía</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Beekman, George, Introducción a la informática, España, Editorial Pearson Educación, 2006.</li>
+                            <li>Coello Coello, Carlos A., Breve historia de la computación y sus pioneros, México, Editorial Fondo de Cultura Económica, 2003.</li>
+                            <li>Flores Cuevas, Francisco, Fundamentos de computación, México, Editorial Minerva, 2002.</li>
+                            <li>González Martínez, Martín, Tecnologías de la información, México, Editorial McGraw-Hill, 2010.</li>
+                            <li>Kurose, James F., Redes de computadores: un enfoque descendente, editorial Addison Wesley, 2010.</li>
+                            <li>Martos Rubio, Ana, Introducción a la informática, España, Editorial Anaya Multimedia, 2009.</li>
+                            <li>Tanenbaum, Andrew S., Redes de computadoras, México, Editorial Prentice Hall/Pearson, 2003.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <a href="../pages/inicio.html" class="btn btn-primary">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center mt-5">
+        <div class="container p-3">
+            © 2026 ESCOLAR_U - Plataforma Educativa
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+  import { protegerPagina } from "../js/roles.js";
+  protegerPagina("alumno", "../");
+</script>
+</body>
+</html>

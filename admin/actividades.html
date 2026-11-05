@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividades - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · ACTIVIDADES</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                
+                <!-- Barra de búsqueda existente -->
+                <li class="nav-item me-3">
+                    <form class="d-flex" onsubmit="event.preventDefault(); window.location.href='../pages/buscar.html?q=' + encodeURIComponent(this.buscar.value);">
+                        <input type="text" name="buscar" class="form-control form-control-sm" placeholder="Buscar..." style="width:180px;">
+                    </form>
+                </li>
+
+                <!-- NUEVO BOTÓN VOLVER (Mismo estilo que Cerrar Sesión) -->
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="#" id="btnVolverPanel">
+                        <i class="fas fa-arrow-left"></i> Volver al Panel
+                    </a>
+                </li>
+
+                <!-- Botón Cerrar Sesión existente -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Selector de materia -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <label class="form-label"><strong>Selecciona una materia</strong></label>
+            <select class="form-select" id="selectorMateria">
+                <option value="">Cargando materias...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="card mb-4" id="panelAcciones" style="display:none;">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-1" id="tituloMateria">—</h5>
+                <small class="text-muted" id="infoActividades">0 actividades</small>
+            </div>
+            <button class="btn btn-primary" id="btnNueva">
+                <i class="fas fa-plus"></i> Nueva actividad
+            </button>
+        </div>
+    </div>
+
+    <!-- Formulario crear/editar -->
+    <div class="card mb-4" id="panelForm" style="display:none;">
+        <div class="card-header" id="tituloForm">
+            <i class="fas fa-plus-circle me-2"></i> Nueva actividad
+        </div>
+        <div class="card-body">
+            <form id="formActividad">
+                <input type="hidden" id="actividadId" value="">
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Título de la actividad *</label>
+                        <input type="text" class="form-control form-control-lg" id="titulo" required maxlength="150"
+                               placeholder="Ej: Ensayo sobre Inteligencia Artificial">
+                    </div>
+                </div>
+
+                <!-- Instrucciones (hoja en blanco) -->
+                <div class="border rounded p-3 bg-light mt-3">
+                    <h6 class="mb-3"><i class="fas fa-file-alt me-1"></i> Instrucciones (hoja en blanco)</h6>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Título de las instrucciones</label>
+                            <input type="text" class="form-control" id="instrTitulo" maxlength="120"
+                                   placeholder="Ej: Instrucciones del ensayo">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Subtítulo (opcional)</label>
+                            <input type="text" class="form-control" id="instrSubtitulo" maxlength="160"
+                                   placeholder="Ej: Unidad 1 — Conceptos básicos">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Contenido de las instrucciones *</label>
+                            <textarea class="form-control hoja-textarea" id="instrTexto" rows="10"
+                                      placeholder="Escribe aquí lo que el alumno debe hacer..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recursos -->
+                <div class="border rounded p-3 bg-light mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="fas fa-paperclip me-1"></i> Recursos de apoyo (opcional)</h6>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddVideo">
+                                <i class="fas fa-video"></i> Video
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddImagen">
+                                <i class="fas fa-image"></i> Imagen
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddPdf">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div id="listaRecursos">
+                        <p class="text-muted small mb-0">Sin recursos. Agrega uno si lo necesitas.</p>
+                    </div>
+                </div>
+
+                <!-- Fecha, puntaje, tipos -->
+                <div class="row g-3 mt-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha límite (opcional)</label>
+                        <input type="datetime-local" class="form-control" id="fechaLimite">
+                        <small class="text-muted">Si se deja vacío, no vence.</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Puntaje máximo</label>
+                        <input type="number" class="form-control" id="puntajeMaximo"
+                               value="10" min="1" max="100" step="0.1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label d-block">Tipos de archivo permitidos</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="pdf" id="t_pdf" checked>
+                            <label class="form-check-label" for="t_pdf">PDF</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="docx" id="t_docx" checked>
+                            <label class="form-check-label" for="t_docx">Word</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="txt" id="t_txt" checked>
+                            <label class="form-check-label" for="t_txt">TXT</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="png" id="t_png" checked>
+                            <label class="form-check-label" for="t_png">PNG</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="jpg" id="t_jpg" checked>
+                            <label class="form-check-label" for="t_jpg">JPG</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="jpeg" id="t_jpeg" checked>
+                            <label class="form-check-label" for="t_jpeg">JPEG</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="tif" id="t_tif" checked>
+                            <label class="form-check-label" for="t_tif">TIF</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input tipo-check" type="checkbox" value="webp" id="t_webp" checked>
+                            <label class="form-check-label" for="t_webp">WEBP</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save me-1"></i> Publicar actividad
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnCancelar">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+            <div id="mensajeForm" class="mt-3" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Listado de actividades -->
+    <div class="card" id="panelLista" style="display:none;">
+        <div class="card-header">
+            <i class="fas fa-list me-2"></i> Actividades de la materia
+        </div>
+        <div class="card-body p-0">
+            <div id="listaActividades" class="p-3">
+                <p class="text-muted text-center py-4">Sin actividades.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Actividades
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, observarSesion } from "../js/auth.js";
+    import { listarMaterias } from "../js/materias.js";
+    import {
+        listarActividadesPorMateria, crearActividad,
+        actualizarActividad, borrarActividad, formatearFechaLimite
+    } from "../js/actividades.js";
+    import { normalizarUrlVideo, convertirUrlImagen } from "../js/render.js";
+
+    // Guardia: solo admin/supervisor
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) { window.location.href = "../index.html"; return; }
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // ---------- Estado ----------
+    let materiaId = null;
+    let materiaNombre = "";
+    let actividades = [];
+    let recursos = [];   // { tipo, url, descripcion }
+
+    // ---------- Mensajes ----------
+    function mostrarMsg(texto, tipo) {
+        const m = document.getElementById("mensajeForm");
+        m.style.display = "block";
+        m.className = tipo === "ok" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
+        m.textContent = texto;
+        setTimeout(() => { m.style.display = "none"; }, 4000);
+    }
+
+    // ---------- Cargar materias ----------
+    async function cargarMaterias() {
+        const sel = document.getElementById("selectorMateria");
+        const res = await listarMaterias();
+        if (!res.ok) {
+            sel.innerHTML = `<option>Error: ${res.error}</option>`;
+            return;
+        }
+        sel.innerHTML = '<option value="">— Selecciona una materia —</option>';
+        res.materias.forEach((m) => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = m.nombre;
+            sel.appendChild(opt);
+        });
+    }
+
+    // ---------- Cambio de materia ----------
+    document.getElementById("selectorMateria").addEventListener("change", (e) => {
+        materiaId = e.target.value;
+        const sel = e.target;
+        materiaNombre = sel.options[sel.selectedIndex].textContent;
+
+        if (!materiaId) {
+            ocultarTodo();
+            return;
+        }
+        mostrarPaneles();
+        cargarActividades();
+    });
+
+    function mostrarPaneles() {
+        document.getElementById("panelAcciones").style.display = "block";
+        document.getElementById("panelLista").style.display = "block";
+        document.getElementById("panelForm").style.display = "none";
+    }
+
+    function ocultarTodo() {
+        document.getElementById("panelAcciones").style.display = "none";
+        document.getElementById("panelLista").style.display = "none";
+        document.getElementById("panelForm").style.display = "none";
+    }
+
+    // ---------- Cargar actividades ----------
+    async function cargarActividades() {
+        const cont = document.getElementById("listaActividades");
+        cont.innerHTML = '<p class="text-muted text-center py-4">Cargando...</p>';
+
+        const res = await listarActividadesPorMateria(materiaId, false);
+        if (!res.ok) {
+            cont.innerHTML = `<p class="text-danger text-center py-4">${res.error}</p>`;
+            return;
+        }
+
+        actividades = res.actividades;
+        document.getElementById("tituloMateria").textContent = materiaNombre;
+        document.getElementById("infoActividades").textContent =
+            `${actividades.length} actividad(es)`;
+
+        if (actividades.length === 0) {
+            cont.innerHTML = '<p class="text-muted text-center py-4">Aún no hay actividades. Crea la primera.</p>';
+            return;
+        }
+
+        cont.innerHTML = "";
+        actividades.forEach((a) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-3 bg-white";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div class="me-3 flex-grow-1">
+                        <h5 class="mb-1">${a.titulo || "Sin título"}</h5>
+                        <div class="text-muted small mb-2">
+                            <i class="fas fa-calendar me-1"></i> ${formatearFechaLimite(a)}
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-star me-1"></i> ${a.puntajeMaximo || 10} pts
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-paperclip me-1"></i> ${(a.recursos || []).length} recurso(s)
+                            &nbsp;·&nbsp;
+                            <span class="badge ${a.activa ? 'bg-success' : 'bg-secondary'}">
+                                ${a.activa ? "Activa" : "Inactiva"}
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            Tipos: ${(a.tiposPermitidos || []).join(", ") || "—"}
+                        </small>
+                    </div>
+
+                    
+                    <div class="btn-group">
+    <a class="btn btn-sm btn-success" href="revisar-entregas.html?id=${a.id}" title="Revisar entregas">
+        <i class="fas fa-check-circle"></i> Calificar
+    </a>
+    <button class="btn btn-sm btn-outline-primary btn-editar" data-id="${a.id}" title="Editar">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-danger btn-borrar" data-id="${a.id}" data-titulo="${a.titulo}" title="Borrar">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+
+                </div>
+            `;
+            cont.appendChild(div);
+        });
+
+        cont.querySelectorAll(".btn-editar").forEach((b) => {
+            b.addEventListener("click", () => editarActividad(b.dataset.id));
+        });
+        cont.querySelectorAll(".btn-borrar").forEach((b) => {
+            b.addEventListener("click", () => eliminarActividad(b.dataset.id, b.dataset.titulo));
+        });
+    }
+
+    // ---------- Nueva actividad ----------
+    document.getElementById("btnNueva").addEventListener("click", resetForm);
+
+    // ---------- Cancelar ----------
+    document.getElementById("btnCancelar").addEventListener("click", () => {
+        document.getElementById("panelForm").style.display = "none";
+        resetForm();
+    });
+
+    function resetForm() {
+        document.getElementById("formActividad").reset();
+        document.getElementById("actividadId").value = "";
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-plus-circle me-2"></i> Nueva actividad';
+        document.getElementById("btnGuardar").innerHTML =
+            '<i class="fas fa-save me-1"></i> Publicar actividad';
+        document.getElementById("puntajeMaximo").value = 10;
+        document.getElementById("listaRecursos").innerHTML =
+            '<p class="text-muted small mb-0">Sin recursos. Agrega uno si lo necesitas.</p>';
+        document.getElementById("panelForm").style.display = "block";
+        document.getElementById("panelForm").scrollIntoView({ behavior: "smooth" });
+        recursos = [];
+    }
+
+    // ---------- Editar actividad ----------
+    function editarActividad(id) {
+        const a = actividades.find((x) => x.id === id);
+        if (!a) return;
+
+        document.getElementById("actividadId").value = a.id;
+        document.getElementById("titulo").value = a.titulo || "";
+        document.getElementById("instrTitulo").value = a.instrucciones?.titulo || "";
+        document.getElementById("instrSubtitulo").value = a.instrucciones?.subtitulo || "";
+        document.getElementById("instrTexto").value = a.instrucciones?.texto || "";
+        document.getElementById("puntajeMaximo").value = a.puntajeMaximo || 10;
+
+        // Fecha límite
+        if (a.fechaLimite) {
+            const d = a.fechaLimite.toDate ? a.fechaLimite.toDate() : new Date(a.fechaLimite.seconds * 1000);
+            const iso = d.toISOString().slice(0, 16);
+            document.getElementById("fechaLimite").value = iso;
+        } else {
+            document.getElementById("fechaLimite").value = "";
+        }
+
+        // Tipos permitidos
+        document.querySelectorAll(".tipo-check").forEach((c) => {
+            c.checked = (a.tiposPermitidos || []).includes(c.value);
+        });
+
+        // Recursos
+        recursos = JSON.parse(JSON.stringify(a.recursos || []));
+        pintarRecursos();
+
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-edit me-2"></i> Editar actividad';
+        document.getElementById("btnGuardar").innerHTML =
+            '<i class="fas fa-save me-1"></i> Guardar cambios';
+        document.getElementById("panelForm").style.display = "block";
+        document.getElementById("panelForm").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ---------- Recursos ----------
+    document.getElementById("btnAddVideo").addEventListener("click", () => {
+        recursos.push({ tipo: "video", url: "", descripcion: "" });
+        pintarRecursos();
+    });
+    document.getElementById("btnAddImagen").addEventListener("click", () => {
+        recursos.push({ tipo: "imagen", url: "", descripcion: "" });
+        pintarRecursos();
+    });
+    document.getElementById("btnAddPdf").addEventListener("click", () => {
+        recursos.push({ tipo: "pdf", url: "", descripcion: "" });
+        pintarRecursos();
+    });
+
+    function pintarRecursos() {
+        const cont = document.getElementById("listaRecursos");
+        if (recursos.length === 0) {
+            cont.innerHTML = '<p class="text-muted small mb-0">Sin recursos. Agrega uno si lo necesitas.</p>';
+            return;
+        }
+        cont.innerHTML = "";
+        recursos.forEach((r, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-2 mb-2 bg-white";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="small">
+                        ${r.tipo === "video" ? "🎬 Video" : r.tipo === "imagen" ? "🖼️ Imagen" : "📄 PDF"}
+                    </strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-rec" data-idx="${i}">×</button>
+                </div>
+                <input class="form-control form-control-sm mb-2 inp-rec-url" data-idx="${i}"
+                       placeholder="${r.tipo === "video" ? "https://youtu.be/..." : "https://drive.google.com/file/d/.../view"}"
+                       value="${r.url || ""}">
+                <input class="form-control form-control-sm inp-rec-desc" data-idx="${i}"
+                       placeholder="Descripción (opcional)" value="${r.descripcion || ""}">
+            `;
+            cont.appendChild(div);
+        });
+
+        cont.querySelectorAll(".btn-quitar-rec").forEach((b) => {
+            b.addEventListener("click", () => {
+                const idx = Number(b.dataset.idx);
+                recursos.splice(idx, 1);
+                pintarRecursos();
+            });
+        });
+
+        cont.querySelectorAll(".inp-rec-url").forEach((inp) => {
+            inp.addEventListener("input", () => {
+                recursos[Number(inp.dataset.idx)].url = inp.value.trim();
+            });
+        });
+        cont.querySelectorAll(".inp-rec-desc").forEach((inp) => {
+            inp.addEventListener("input", () => {
+                recursos[Number(inp.dataset.idx)].descripcion = inp.value.trim();
+            });
+        });
+    }
+
+    // ---------- Guardar ----------
+    document.getElementById("formActividad").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById("actividadId").value;
+        const titulo = document.getElementById("titulo").value.trim();
+        const instrTitulo = document.getElementById("instrTitulo").value.trim();
+        const instrSubtitulo = document.getElementById("instrSubtitulo").value.trim();
+        const instrTexto = document.getElementById("instrTexto").value;
+        const fechaLimite = document.getElementById("fechaLimite").value;
+        const puntajeMaximo = Number(document.getElementById("puntajeMaximo").value) || 10;
+
+        if (!titulo) { alert("El título es obligatorio"); return; }
+        if (!instrTexto.trim()) { alert("El contenido de las instrucciones es obligatorio"); return; }
+
+        // Recursos (solo los que tienen URL)
+        const recursosLimpios = recursos.filter((r) => r.url && r.url.trim());
+        if (recursosLimpios.length !== recursos.length) {
+            if (!confirm("Hay recursos sin URL. Se ignorarán. ¿Continuar?")) return;
+        }
+
+        // Tipos permitidos
+        const tiposPermitidos = [];
+        document.querySelectorAll(".tipo-check:checked").forEach((c) => tiposPermitidos.push(c.value));
+        if (tiposPermitidos.length === 0) {
+            alert("Selecciona al menos un tipo de archivo permitido");
+            return;
+        }
+
+        const datos = {
+            materiaId,
+            materiaNombre,
+            titulo,
+            instrucciones: {
+                titulo: instrTitulo,
+                subtitulo: instrSubtitulo,
+                texto: instrTexto
+            },
+            recursos: recursosLimpios,
+            fechaLimite: fechaLimite || null,
+            puntajeMaximo,
+            tiposPermitidos
+        };
+
+        const btn = document.getElementById("btnGuardar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+
+        let res;
+        if (id) res = await actualizarActividad(id, datos);
+        else    res = await crearActividad(datos);
+
+        btn.disabled = false;
+        btn.innerHTML = id
+            ? '<i class="fas fa-save me-1"></i> Guardar cambios'
+            : '<i class="fas fa-save me-1"></i> Publicar actividad';
+
+        if (res.ok) {
+            mostrarMsg(id ? "✅ Actividad actualizada" : "✅ Actividad publicada", "ok");
+            document.getElementById("panelForm").style.display = "none";
+            cargarActividades();
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    // ---------- Eliminar ----------
+    async function eliminarActividad(id, titulo) {
+        if (!confirm(`¿Borrar la actividad "${titulo}"?\n\nTambién se borrarán TODAS las entregas de los alumnos.`)) return;
+        const res = await borrarActividad(id);
+        if (res.ok) cargarActividades();
+        else alert(res.error);
+    }
+
+        // Lógica del botón superior para volver al panel correcto
+    document.getElementById("btnVolverPanel").addEventListener("click", (e) => {
+        e.preventDefault();
+        observarSesion(({ logueado, rol }) => {
+            if (logueado && rol === "supervisor") {
+                window.location.href = "../supervisor/dashboard.html";
+            } else if (logueado && rol === "admin") {
+                window.location.href = "dashboard-admin.html";
+            } else {
+                window.location.href = "../index.html";
+            }
+        });
+    });
+
+    // ---------- Inicial ----------
+    cargarMaterias();
+</script>
+
+</body>
+</html>

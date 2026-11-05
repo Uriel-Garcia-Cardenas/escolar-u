@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anuncios - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · ANUNCIOS</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Formulario -->
+    <div class="card mb-4">
+        <div class="card-header" id="tituloForm">
+            <i class="fas fa-bullhorn me-2"></i> Nuevo anuncio
+        </div>
+        <div class="card-body">
+            <form id="formAnuncio">
+                <input type="hidden" id="anuncioId" value="">
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Título *</label>
+                        <input type="text" class="form-control" id="titulo" required maxlength="120">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Prioridad</label>
+                        <select class="form-select" id="prioridad">
+                            <option value="normal">Normal</option>
+                            <option value="importante">Importante</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Mensaje *</label>
+                        <textarea class="form-control" id="mensaje" rows="4" required maxlength="800"></textarea>
+                    </div>
+
+                    <!-- Selector de materias -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            <i class="fas fa-book me-1"></i> Dirigido a:
+                        </label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="tipoDestino"
+                                   id="destinoGlobal" value="global" checked>
+                            <label class="form-check-label" for="destinoGlobal">
+                                <strong>Global</strong> — todos los usuarios lo verán
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="tipoDestino"
+                                   id="destinoMaterias" value="materias">
+                            <label class="form-check-label" for="destinoMaterias">
+                                <strong>Materias específicas</strong> — solo alumnos inscritos
+                            </label>
+                        </div>
+
+                        <div id="panelMaterias" class="border rounded p-3 bg-light mt-2" style="display:none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">
+                                    Marca las materias a las que va dirigido el anuncio.
+                                </small>
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnTodas">
+                                        Todas
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnNinguna">
+                                        Ninguna
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="listaMateriasCheck" class="row g-2">
+                                <p class="text-muted small mb-0">Cargando materias...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Expira (opcional)</label>
+                        <input type="date" class="form-control" id="expira">
+                        <small class="text-muted">Si se deja vacío, el anuncio nunca expira.</small>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save me-1"></i> Publicar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnCancelar" style="display:none;">
+                        Cancelar edición
+                    </button>
+                </div>
+            </form>
+            <div id="mensajeForm" class="mt-3" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-list me-2"></i> Anuncios publicados</span>
+            <button class="btn btn-sm btn-outline-primary" id="btnRefrescar">
+                <i class="fas fa-sync-alt"></i> Refrescar
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div id="listaAnuncios" class="p-3">
+                <p class="text-muted text-center py-4">Cargando...</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Anuncios
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, observarSesion } from "../js/auth.js";
+    import {
+        listarAnuncios, crearAnuncio, actualizarAnuncio, borrarAnuncio,
+        formatearFecha, colorPrioridad
+    } from "../js/anuncios.js";
+    import { listarMaterias } from "../js/materias.js";
+
+    // Solo admin y supervisor
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) {
+            window.location.href = "../index.html";
+            return;
+        }
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    let anuncios = [];
+    let materias = [];
+
+    // Mapa id → nombre de materia (para mostrar en la lista)
+    function nombreMateria(id) {
+        const m = materias.find((x) => x.id === id);
+        return m ? m.nombre : id;
+    }
+
+    // ---------- Cargar materias ----------
+    async function cargarMaterias() {
+        const cont = document.getElementById("listaMateriasCheck");
+        const res = await listarMaterias();
+
+        if (!res.ok) {
+            cont.innerHTML = `<p class="text-danger small">${res.error}</p>`;
+            return;
+        }
+        materias = res.materias;
+
+        if (materias.length === 0) {
+            cont.innerHTML = '<p class="text-muted small mb-0">No hay materias registradas.</p>';
+            return;
+        }
+
+        cont.innerHTML = "";
+        materias.forEach((m) => {
+            const col = document.createElement("div");
+            col.className = "col-md-6";
+            col.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input check-materia" type="checkbox"
+                           value="${m.id}" id="chk_${m.id}">
+                    <label class="form-check-label" for="chk_${m.id}">
+                        ${m.nombre}
+                    </label>
+                </div>
+            `;
+            cont.appendChild(col);
+        });
+    }
+
+    // ---------- Mostrar/ocultar panel de materias ----------
+    document.querySelectorAll('input[name="tipoDestino"]').forEach((r) => {
+        r.addEventListener("change", () => {
+            const esMaterias = document.getElementById("destinoMaterias").checked;
+            document.getElementById("panelMaterias").style.display = esMaterias ? "block" : "none";
+        });
+    });
+
+    document.getElementById("btnTodas").addEventListener("click", () => {
+        document.querySelectorAll(".check-materia").forEach((c) => c.checked = true);
+    });
+    document.getElementById("btnNinguna").addEventListener("click", () => {
+        document.querySelectorAll(".check-materia").forEach((c) => c.checked = false);
+    });
+
+    // ---------- Mensajes ----------
+    function mostrarMsg(texto, tipo) {
+        const m = document.getElementById("mensajeForm");
+        m.style.display = "block";
+        m.className = tipo === "ok" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
+        m.textContent = texto;
+        setTimeout(() => { m.style.display = "none"; }, 4000);
+    }
+
+    // ---------- Render lista ----------
+    function pintar() {
+        const cont = document.getElementById("listaAnuncios");
+
+        if (anuncios.length === 0) {
+            cont.innerHTML = '<p class="text-muted text-center py-4">No hay anuncios publicados.</p>';
+            return;
+        }
+
+        cont.innerHTML = "";
+        anuncios.forEach((a) => {
+            const c = colorPrioridad(a.prioridad);
+            const dirigidas = Array.isArray(a.materiasDirigidas) ? a.materiasDirigidas : [];
+            const destinoTexto = dirigidas.length === 0
+                ? '<span class="badge bg-secondary"><i class="fas fa-globe me-1"></i>Global</span>'
+                : dirigidas.map((id) =>
+                    `<span class="badge bg-primary me-1">${nombreMateria(id)}</span>`
+                  ).join("");
+
+            const div = document.createElement("div");
+            div.className = `alert alert-${c.bg} alert-dismissible fade show mb-3`;
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div class="me-3">
+                        <h5 class="mb-1">
+                            <i class="fas fa-${c.icon} me-2"></i>${a.titulo || "Sin título"}
+                        </h5>
+                        <p class="mb-2">${a.mensaje || ""}</p>
+                        <div class="mb-2">${destinoTexto}</div>
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>${a.autorEmail || "—"}
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-clock me-1"></i>${formatearFecha(a.fecha)}
+                            ${a.expira ? `&nbsp;·&nbsp;<i class="fas fa-hourglass-end me-1"></i>Expira: ${formatearFecha(a.expira)}` : ""}
+                        </small>
+                    </div>
+                    <div class="btn-group-vertical">
+                        <button class="btn btn-sm btn-outline-dark btn-editar" data-id="${a.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark btn-borrar" data-id="${a.id}" data-titulo="${a.titulo}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            cont.appendChild(div);
+        });
+
+        cont.querySelectorAll(".btn-editar").forEach((b) => {
+            b.addEventListener("click", () => editar(b.dataset.id));
+        });
+        cont.querySelectorAll(".btn-borrar").forEach((b) => {
+            b.addEventListener("click", () => eliminar(b.dataset.id, b.dataset.titulo));
+        });
+    }
+
+    // ---------- Cargar ----------
+    async function cargar() {
+        const cont = document.getElementById("listaAnuncios");
+        cont.innerHTML = '<p class="text-muted text-center py-4">Cargando...</p>';
+
+        const res = await listarAnuncios(50);
+        if (!res.ok) {
+            cont.innerHTML = `<p class="text-danger text-center py-4">${res.error}</p>`;
+            return;
+        }
+        anuncios = res.anuncios;
+        pintar();
+    }
+
+    // ---------- Editar ----------
+    function editar(id) {
+        const a = anuncios.find((x) => x.id === id);
+        if (!a) return;
+
+        document.getElementById("anuncioId").value = a.id;
+        document.getElementById("titulo").value     = a.titulo || "";
+        document.getElementById("mensaje").value    = a.mensaje || "";
+        document.getElementById("prioridad").value  = a.prioridad || "normal";
+        if (a.expira) {
+            const d = a.expira.toDate ? a.expira.toDate() : new Date(a.expira.seconds * 1000);
+            document.getElementById("expira").value = d.toISOString().slice(0, 10);
+        } else {
+            document.getElementById("expira").value = "";
+        }
+
+        // Materias
+        const dirigidas = Array.isArray(a.materiasDirigidas) ? a.materiasDirigidas : [];
+        if (dirigidas.length > 0) {
+            document.getElementById("destinoMaterias").checked = true;
+            document.getElementById("destinoGlobal").checked = false;
+            document.getElementById("panelMaterias").style.display = "block";
+            document.querySelectorAll(".check-materia").forEach((c) => {
+                c.checked = dirigidas.includes(c.value);
+            });
+        } else {
+            document.getElementById("destinoGlobal").checked = true;
+            document.getElementById("destinoMaterias").checked = false;
+            document.getElementById("panelMaterias").style.display = "none";
+            document.querySelectorAll(".check-materia").forEach((c) => c.checked = false);
+        }
+
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-edit me-2"></i> Editar anuncio';
+        document.getElementById("btnGuardar").innerHTML =
+            '<i class="fas fa-save me-1"></i> Actualizar';
+        document.getElementById("btnCancelar").style.display = "inline-block";
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.getElementById("btnCancelar").addEventListener("click", resetForm);
+
+    function resetForm() {
+        document.getElementById("formAnuncio").reset();
+        document.getElementById("anuncioId").value = "";
+        document.getElementById("destinoGlobal").checked = true;
+        document.getElementById("panelMaterias").style.display = "none";
+        document.querySelectorAll(".check-materia").forEach((c) => c.checked = false);
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-bullhorn me-2"></i> Nuevo anuncio';
+        document.getElementById("btnGuardar").innerHTML =
+            '<i class="fas fa-save me-1"></i> Publicar';
+        document.getElementById("btnCancelar").style.display = "none";
+    }
+
+    // ---------- Eliminar ----------
+    async function eliminar(id, titulo) {
+        if (!confirm(`¿Borrar el anuncio "${titulo}"?`)) return;
+        const res = await borrarAnuncio(id);
+        if (res.ok) cargar();
+        else alert(res.error);
+    }
+
+    // ---------- Guardar ----------
+    document.getElementById("formAnuncio").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById("anuncioId").value;
+        const esMaterias = document.getElementById("destinoMaterias").checked;
+
+        // Recolectar materias seleccionadas
+        let materiasDirigidas = [];
+        if (esMaterias) {
+            document.querySelectorAll(".check-materia").forEach((c) => {
+                if (c.checked) materiasDirigidas.push(c.value);
+            });
+            if (materiasDirigidas.length === 0) {
+                mostrarMsg("Selecciona al menos una materia o cambia a Global", "error");
+                return;
+            }
+        }
+
+        const datos = {
+            titulo:    document.getElementById("titulo").value.trim(),
+            mensaje:   document.getElementById("mensaje").value.trim(),
+            prioridad: document.getElementById("prioridad").value,
+            expira:    document.getElementById("expira").value || null,
+            materiasDirigidas
+        };
+
+        const btn = document.getElementById("btnGuardar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+
+        let res;
+        if (id) res = await actualizarAnuncio(id, datos);
+        else    res = await crearAnuncio(datos);
+
+        btn.disabled = false;
+        btn.innerHTML = id
+            ? '<i class="fas fa-save me-1"></i> Actualizar'
+            : '<i class="fas fa-save me-1"></i> Publicar';
+
+        if (res.ok) {
+            mostrarMsg(id ? "Anuncio actualizado" : "Anuncio publicado", "ok");
+            resetForm();
+            cargar();
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    document.getElementById("btnRefrescar").addEventListener("click", cargar);
+
+    // Inicial
+    await cargarMaterias();
+    cargar();
+</script>
+
+</body>
+</html>

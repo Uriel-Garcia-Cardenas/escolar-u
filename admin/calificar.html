@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificar Alumnos - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · CALIFICAR ALUMNOS</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="#" id="btnVolverPanel">
+            <i class="fas fa-arrow-left"></i> Volver al Panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Selección de materia -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <label class="form-label"><strong>Selecciona una materia</strong></label>
+            <select class="form-select" id="selectorMateria">
+                <option value="">Cargando materias...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla de calificaciones -->
+    <div class="card" id="panelTabla" style="display:none;">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span id="tituloMateria"><i class="fas fa-clipboard-check me-2"></i> —</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-info text-dark" id="infoAlumnos">0 alumnos</span>
+                <button class="btn btn-sm btn-outline-primary" id="btnConfigurar">
+                    <i class="fas fa-cog"></i> Configurar Parciales
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="tablaCalif">
+                    <thead class="table-light" id="theadCalif">
+                        <!-- Se genera dinámicamente -->
+                    </thead>
+                    <tbody id="tablaCalificaciones">
+                        <tr><td colspan="10" class="text-center text-muted py-4">Selecciona una materia.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="mensaje" class="mt-3" style="display:none;"></div>
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Calificar Alumnos
+    </div>
+</footer>
+
+<!-- Modal de Actividades del Alumno -->
+<div class="modal fade" id="modalActividadesAlumno" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-white border-bottom-0 pb-0">
+                <h5 class="modal-title" id="modalTituloAlumno">Actividades del Alumno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Resumen -->
+                <div class="alert alert-info d-flex flex-column gap-2 mb-4">
+                    <h6 class="mb-0 fw-bold" id="modalResumenTexto">Cargando resumen...</h6>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" id="modalProgresoBarra" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Tabla -->
+                <div class="table-responsive border rounded">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Actividad</th>
+                                <th style="width: 130px;">Fecha Entrega</th>
+                                <th style="width: 130px;">Calificación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalTablaActividades">
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Cargando actividades...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { observarSesion, logout } from "../js/auth.js";
+    import { listarMaterias, obtenerMateria, actualizarMateria } from "../js/materias.js";
+    import { listarUsuarios } from "../js/usuarios.js";
+    import { guardarCalificacion, listarCalificacionesPorMateria, calcularPromedio } from "../js/calificaciones.js";
+    import { listarActividadesPorMateria, listarEntregasAlumnoMateria } from "../js/actividades.js";
+
+    observarSesion(({ logueado, rol }) => {
+        if (!logueado) return;
+        if (rol !== "admin" && rol !== "supervisor") {
+            window.location.href = "../pages/dashboard.html";
+        }
+    });
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    document.getElementById("btnVolverPanel").addEventListener("click", (e) => {
+        e.preventDefault();
+        observarSesion(({ logueado, rol }) => {
+            if (logueado && rol === "supervisor") window.location.href = "../supervisor/dashboard.html";
+            else if (logueado && rol === "admin") window.location.href = "dashboard-admin.html";
+            else window.location.href = "../index.html";
+        });
+    });
+
+    // ---------- Estado ----------
+    let materiaId = null;
+    let materiaNombre = "";
+    let adminUid = null;
+    let alumnos = [];
+    let calificaciones = [];
+    let evaluacionesActuales = []; 
+
+    observarSesion(({ logueado, user }) => { if (logueado) adminUid = user.uid; });
+
+    function mostrarMsg(texto, tipo) {
+        const m = document.getElementById("mensaje");
+        m.style.display = "block";
+        m.className = tipo === "ok" ? "alert alert-success" : "alert alert-danger";
+        m.textContent = texto;
+        setTimeout(() => { m.style.display = "none"; }, 4000);
+    }
+
+    // ---------- Cargar materias ----------
+    async function cargarMaterias() {
+        const sel = document.getElementById("selectorMateria");
+        const res = await listarMaterias();
+        if (!res.ok) { sel.innerHTML = `<option>Error: ${res.error}</option>`; return; }
+
+        sel.innerHTML = '<option value="">— Selecciona una materia —</option>';
+        res.materias.forEach((m) => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = m.nombre;
+            sel.appendChild(opt);
+        });
+    }
+
+    // ---------- Cambio de materia ----------
+    document.getElementById("selectorMateria").addEventListener("change", async (e) => {
+        materiaId = e.target.value;
+        const sel = e.target;
+        materiaNombre = sel.options[sel.selectedIndex].textContent;
+
+        if (!materiaId) {
+            document.getElementById("panelTabla").style.display = "none";
+            return;
+        }
+
+        const resM = await obtenerMateria(materiaId);
+        if (resM.ok && resM.materia.evaluaciones) {
+            evaluacionesActuales = resM.materia.evaluaciones;
+        } else {
+            evaluacionesActuales = ["Parcial 1", "Parcial 2", "Parcial 3", "Final"];
+        }
+
+        document.getElementById("panelTabla").style.display = "block";
+        await cargarAlumnosYCalificaciones();
+    });
+
+    // ---------- Configurar Parciales ----------
+    document.getElementById("btnConfigurar").addEventListener("click", async () => {
+        const texto = prompt(
+            "Escribe los nombres de las evaluaciones separados por coma.\nEjemplo: Parcial 1, Parcial 2, Trabajo Final", 
+            evaluacionesActuales.join(", ")
+        );
+        if (!texto) return;
+
+        const nuevasEval = texto.split(",").map(s => s.trim()).filter(s => s !== "");
+        if (nuevasEval.length === 0) { alert("Debes escribir al menos un nombre válido."); return; }
+
+        const btn = document.getElementById("btnConfigurar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const res = await actualizarMateria(materiaId, { evaluaciones: nuevasEval });
+        
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-cog"></i> Configurar Parciales';
+
+        if (res.ok) {
+            evaluacionesActuales = nuevasEval;
+            await cargarAlumnosYCalificaciones();
+            mostrarMsg("✅ Configuración de parciales actualizada", "ok");
+        } else {
+            alert("Error al guardar configuración: " + res.error);
+        }
+    });
+
+    // ---------- Cargar alumnos + calificaciones ----------
+    async function cargarAlumnosYCalificaciones() {
+        const thead = document.getElementById("theadCalif");
+        const tbody = document.getElementById("tablaCalificaciones");
+        
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Cargando...</td></tr>';
+
+        const resU = await listarUsuarios();
+        if (!resU.ok) return;
+        alumnos = resU.usuarios.filter(u => u.rol === "alumno" && (u.materiasAsignadas || []).includes(materiaId));
+
+        const resC = await listarCalificacionesPorMateria(materiaId);
+        calificaciones = resC.ok ? resC.calificaciones : [];
+
+        let thHTML = `<tr><th>Alumno</th>`;
+        evaluacionesActuales.forEach(ev => {
+            thHTML += `<th style="width:110px;">${ev}</th>`;
+        });
+        thHTML += `<th style="width:90px;">Promedio</th><th style="width:130px;">Acciones</th></tr>`;
+        thead.innerHTML = thHTML;
+
+        document.getElementById("tituloMateria").innerHTML = `<i class="fas fa-clipboard-check me-2"></i> ${materiaNombre}`;
+        document.getElementById("infoAlumnos").textContent = `${alumnos.length} alumno(s)`;
+
+        if (alumnos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${evaluacionesActuales.length + 3}" class="text-center text-muted py-4">No hay alumnos en esta materia.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        alumnos.forEach((a) => {
+            const cal = calificaciones.find((c) => c.alumnoUid === a.uid) || {};
+            let notas = cal.notas || {};
+            if (Object.keys(notas).length === 0) {
+                if (cal.parcial1 != null) notas["Parcial 1"] = cal.parcial1;
+                if (cal.parcial2 != null) notas["Parcial 2"] = cal.parcial2;
+                if (cal.parcial3 != null) notas["Parcial 3"] = cal.parcial3;
+                if (cal.final != null) notas["Final"] = cal.final;
+            }
+
+            const prom = calcularPromedio(cal);
+            let tdInputs = "";
+            evaluacionesActuales.forEach(ev => {
+                const val = notas[ev] ?? "";
+                tdInputs += `<td><input type="number" class="form-control form-control-sm inp-nota" data-uid="${a.uid}" data-eval="${ev}" min="0" max="10" step="0.1" value="${val}"></td>`;
+            });
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <a href="#" class="fw-bold text-decoration-none text-primary btn-ver-actividades" 
+                       data-uid="${a.uid}" 
+                       data-nombre="${a.nombre || a.email}">
+                        ${a.nombre || "—"}
+                    </a><br>
+                    <small class="text-muted">${a.email}</small>
+                </td>
+                ${tdInputs}
+                <td><span class="badge bg-primary" data-prom="${a.uid}">${prom ?? "—"}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary btn-guardar" data-uid="${a.uid}">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr); 
+        });
+
+        // Listeners para el modal de actividades
+        tbody.querySelectorAll(".btn-ver-actividades").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                abrirModalActividades(btn.dataset.uid, btn.dataset.nombre);
+            });
+        });
+
+        // Listeners de guardar
+        tbody.querySelectorAll(".btn-guardar").forEach((btn) => {
+            btn.addEventListener("click", () => guardarFila(btn.dataset.uid, btn));
+        });
+
+        // Actualizar promedio en vivo
+        tbody.querySelectorAll(".inp-nota").forEach((inp) => {
+            inp.addEventListener("input", () => {
+                const uid = inp.dataset.uid;
+                const inputs = tbody.querySelectorAll(`.inp-nota[data-uid="${uid}"]`);
+                let suma = 0, count = 0;
+                inputs.forEach(i => {
+                    const v = parseFloat(i.value);
+                    if (!isNaN(v)) { suma += v; count++; }
+                });
+                const badge = tbody.querySelector(`[data-prom="${uid}"]`);
+                if (badge) badge.textContent = count > 0 ? (suma / count).toFixed(2) : "—";
+            });
+        });
+    }
+
+    function valorDe(uid, evaluacion) {
+        const inp = document.querySelector(`.inp-nota[data-uid="${uid}"][data-eval="${evaluacion}"]`);
+        if (!inp) return null;
+        const v = inp.value.trim();
+        if (v === "") return null;
+        const n = Number(v);
+        return isNaN(n) ? null : n;
+    }
+
+    async function guardarFila(uid, btn) {
+        const alumno = alumnos.find((a) => a.uid === uid);
+        if (!alumno) return;
+
+        const notas = {};
+        evaluacionesActuales.forEach(ev => {
+            notas[ev] = valorDe(uid, ev);
+        });
+
+        const datos = {
+            alumnoUid: uid,
+            alumnoNombre: alumno.nombre || "",
+            alumnoEmail:  alumno.email  || "",
+            materiaId,
+            materiaNombre,
+            notas,
+            actualizadoPor: adminUid
+        };
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const res = await guardarCalificacion(datos);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+
+        if (res.ok) {
+            mostrarMsg(`✅ Calificación de ${alumno.nombre} guardada`, "ok");
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    }
+
+    // ---------- Modal de Actividades ----------
+    async function abrirModalActividades(alumnoUid, nombreAlumno) {
+        try {
+            document.getElementById("modalTituloAlumno").textContent = `Actividades de: ${nombreAlumno}`;
+            
+            const tbody = document.getElementById("modalTablaActividades");
+            const txtResumen = document.getElementById("modalResumenTexto");
+            const barra = document.getElementById("modalProgresoBarra");
+            
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+            txtResumen.textContent = "Cargando resumen...";
+            barra.style.width = "0%";
+
+            // Mostrar el modal INMEDIATAMENTE para que el usuario vea que sí pasó algo
+            const modalElement = document.getElementById("modalActividadesAlumno");
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+
+            // Cargar datos
+            const resActs = await listarActividadesPorMateria(materiaId, false);
+            if (!resActs.ok) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">${resActs.error}</td></tr>`;
+                return;
+            }
+            const actividades = resActs.actividades;
+
+            const resEntregas = await listarEntregasAlumnoMateria(alumnoUid, materiaId);
+            const entregas = resEntregas.ok ? resEntregas.entregas : [];
+
+            const totalActs = actividades.length;
+            let entregadasCount = 0;
+
+            tbody.innerHTML = "";
+
+            if (totalActs === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Esta materia no tiene actividades creadas aún.</td></tr>';
+                txtResumen.textContent = "No hay actividades en la materia.";
+                return;
+            }
+
+            actividades.forEach(act => {
+                const entrega = entregas.find(e => e.actividadId === act.id);
+                
+                let fechaStr = "—";
+                let notaStr = '<span class="badge bg-danger">Sin entregar</span>';
+
+                if (entrega) {
+                    entregadasCount++;
+                    
+                    if (entrega.fechaEntrega) {
+                        const f = entrega.fechaEntrega.toDate ? entrega.fechaEntrega.toDate() : new Date(entrega.fechaEntrega.seconds * 1000);
+                        fechaStr = f.toLocaleDateString("es-MX");
+                    }
+
+                    if (entrega.calificacion !== null && entrega.calificacion !== undefined) {
+                        notaStr = `<span class="badge bg-success">✅ ${entrega.calificacion} / ${act.puntajeMaximo || 10}</span>`;
+                    } else {
+                        notaStr = '<span class="badge bg-warning text-dark">⏳ Sin calificar</span>';
+                    }
+                }
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${act.titulo}</strong></td>
+                    <td><small class="text-muted">${fechaStr}</small></td>
+                    <td>${notaStr}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const porcentaje = Math.round((entregadasCount / totalActs) * 100);
+            txtResumen.textContent = `Ha entregado ${entregadasCount} de ${totalActs} actividades.`;
+            barra.style.width = `${porcentaje}%`;
+            if (porcentaje < 50) barra.className = "progress-bar bg-danger";
+            else if (porcentaje < 100) barra.className = "progress-bar bg-warning";
+            else barra.className = "progress-bar bg-success";
+
+        } catch (error) {
+            console.error(error);
+            alert("Error al cargar actividades: " + error.message);
+        }
+    }
+
+    // ---------- Inicial ----------
+    cargarMaterias();
+</script>
+
+</body>
+</html>

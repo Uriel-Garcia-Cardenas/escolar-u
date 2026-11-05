@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESCOLAR_U - Plataforma Educativa</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    
+</head>
+<body>
+     <header class="site-header">
+    <div class="container">
+        <div class="logo">
+             <img src="assets/images/escudo_unam.png">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · PLATAFORMA EDUCATIVA</p>
+        </div>
+         <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+    
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+        <div class="container">
+           
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                   
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#contactoModal">Contacto</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+        <div class="modal fade" id="contactoModal" tabindex="-1" aria-labelledby="contactoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white" style="background-color: var(--azul-oscuro) !important;">
+                    <h5 class="modal-title" id="contactoModalLabel"><i class="fas fa-chalkboard-teacher me-2"></i> Contacto Profesora <span id="modal-nombre-titulo"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Información general -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-user-graduate me-2"></i> Profesora</h5>
+                                <p class="mb-0"><strong id="modal-nombre">Cargando...</strong></p>
+                                <hr>
+                                <h5><i class="fas fa-envelope me-2"></i> Correo</h5>
+                                <p><a href="#" id="modal-correo-link"><span id="modal-correo">Cargando...</span></a></p>
+                                <h5><i class="fab fa-facebook me-2"></i> Facebook</h5>
+                                <p><a href="#" id="modal-facebook-link" target="_blank"><span id="modal-facebook">Cargando...</span></a></p>
+                                <h5><i class="fas fa-phone me-2"></i> Teléfono</h5>
+                                <p id="modal-telefono">Cargando...</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ia-info-card p-3 h-100">
+                                <h5><i class="fas fa-clock me-2"></i> Horario de Oficina</h5>
+                                <p id="modal-horario">Cargando...</p>
+                                <p><small class="text-muted">Disponible para dudas y asesorías previa cita.</small></p>
+                                <hr>
+                                <h5><i class="fas fa-calendar-alt me-2"></i> Atención en línea</h5>
+                                <p id="modal-atencion">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Horario semanal de materias -->
+                    <h5 class="mt-3 mb-3 text-center"><i class="fas fa-table-list me-2"></i> Horario de Clases</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Horario</th>
+                                    <th>Materia</th>
+                                    <th>Aula</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-tabla-horarios">
+                                <tr><td colspan="4" class="text-center text-muted">Cargando horario...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0" id="modal-nota">
+                        <i class="fas fa-info-circle me-2"></i> Cargando nota...
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+     <!-- Sección de incio-->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <div class="card-header bg-white border-0">
+                        <h4 class="text-center">Acceso a la plataforma</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="loginForm">
+    <div class="mb-3">
+        <label for="email" class="form-label">Correo</label>
+        <input type="email" class="form-control" id="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="password" placeholder="Contraseña" autocomplete="current-password">
+    </div>
+        <button type="submit" class="btn btn-primary w-100 mb-2" id="btnLogin">Ingresar</button>
+    <a href="pages/inicio.html" class="btn btn-outline-secondary w-100" id="invitado">Ingresar como Invitado</a>
+    
+    <!-- NUEVO: Enlace para solicitar ingreso -->
+    <div class="text-center mt-4 pt-3 border-top">
+        <p class="mb-1 text-muted small">¿Eres alumno y aún no tienes cuenta?</p>
+        <a href="pages/solicitud.html" class="btn btn-link text-decoration-none fw-bold" style="color: var(--azul-medio);">
+            <i class="fas fa-user-plus me-1"></i> Solicitar Ingreso a la Plataforma
+        </a>
+    </div>
+    
+    <div id="mensajeLogin" class="mt-3" style="display:none;"></div>
+</form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <footer class="text-center mt-5">
+    <div class="container p-3">
+            © 2026 ESCOLAR_U - Plataforma Educativa
+    </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script type="module">
+    import { login, observarSesion } from "./js/auth.js";
+    import { redirigirSegunRol } from "./js/roles.js";
+    import { obtenerContacto } from "./js/contacto.js";
+
+    const form     = document.getElementById("loginForm");
+    const email    = document.getElementById("email");
+    const password = document.getElementById("password");
+    const btn      = document.getElementById("btnLogin");
+    const msg      = document.getElementById("mensajeLogin");
+
+    function mostrar(texto, tipo) {
+        msg.style.display = "block";
+        msg.className = tipo === "ok" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
+        msg.textContent = texto;
+    }
+
+    // 1. Si ya hay sesión activa, redirigimos de inmediato
+    observarSesion(({ logueado, user, rol }) => {
+        if (logueado && rol) {
+            redirigirSegunRol(rol, "");
+        }
+    });
+
+    // 2. Envío del formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const correo = email.value.trim();
+        const pass   = password.value;
+
+        if (!correo || !pass) {
+            mostrar("Llena correo y contraseña", "error");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Entrando...";
+
+        const res = await login(correo, pass);
+
+        if (res.ok) {
+            mostrar(`Bienvenido, ${res.user.email}`, "ok");
+            // Leemos el rol y redirigimos
+            const { obtenerRol } = await import("./js/auth.js");
+            const rol = await obtenerRol(res.user.uid);
+            if (rol) {
+                redirigirSegunRol(rol, "");
+            } else {
+                mostrar("Tu cuenta no tiene rol asignado", "error");
+            }
+        } else {
+            btn.disabled = false;
+            btn.textContent = "Ingresar";
+            mostrar(res.error, "error");
+        }
+    });
+
+        // 3. Cargar datos de contacto dinámicos
+    async function cargarContactoModal() {
+        const res = await obtenerContacto();
+        if (!res.ok) return;
+
+        const d = res.datos;
+
+        // Textos
+        document.getElementById("modal-nombre-titulo").textContent = d.nombre || "";
+        document.getElementById("modal-nombre").textContent = d.nombre || "—";
+        document.getElementById("modal-telefono").textContent = d.telefono || "—";
+        document.getElementById("modal-horario").textContent = d.horarioOficina || "—";
+        document.getElementById("modal-atencion").textContent = d.atencionEnLinea || "—";
+
+        // Correo
+        const correoEl = document.getElementById("modal-correo");
+        const correoLink = document.getElementById("modal-correo-link");
+        if (d.correo) {
+            correoEl.textContent = d.correo;
+            correoLink.href = `mailto:${d.correo}`;
+        } else {
+            correoEl.textContent = "—";
+            correoLink.removeAttribute("href");
+        }
+
+        // Facebook
+        const fbEl = document.getElementById("modal-facebook");
+        const fbLink = document.getElementById("modal-facebook-link");
+        if (d.facebook) {
+            // Extraer el nombre de usuario de la URL si es posible
+            let fbText = d.facebook;
+            if (d.facebook.includes("facebook.com/")) {
+                fbText = "@" + d.facebook.split("facebook.com/")[1].replace(/\/$/, "");
+            }
+            fbEl.textContent = fbText;
+            fbLink.href = d.facebook;
+        } else {
+            fbEl.parentElement.parentElement.style.display = "none"; // Ocultar sección si no hay FB
+        }
+
+        // Nota adicional
+        const notaEl = document.getElementById("modal-nota");
+        if (d.notaAdicional) {
+            notaEl.innerHTML = `<i class="fas fa-info-circle me-2"></i> ${d.notaAdicional}`;
+            notaEl.style.display = "block";
+        } else {
+            notaEl.style.display = "none";
+        }
+
+        // Tabla de horarios
+        const tbody = document.getElementById("modal-tabla-horarios");
+        tbody.innerHTML = "";
+
+        if (d.horarioClases && d.horarioClases.length > 0) {
+            d.horarioClases.forEach(h => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${h.dia}</strong></td>
+                        <td>${h.horario}</td>
+                        <td>${h.materia}</td>
+                        <td><span class="badge bg-secondary">${h.aula || "—"}</span></td>
+                    </tr>
+                `;
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay horarios registrados.</td></tr>';
+        }
+    }
+
+    // Llamar a la función al cargar la página
+    cargarContactoModal();
+</script>
+</body>
+</html>

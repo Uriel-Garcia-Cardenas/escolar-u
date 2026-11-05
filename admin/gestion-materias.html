@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Materias - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · GESTIÓN DE MATERIAS</p>
+        </div>
+        <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard-admin.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Formulario crear/editar -->
+    <div class="card mb-4">
+        <div class="card-header" id="tituloForm">
+            <i class="fas fa-plus-circle me-2"></i> Crear nueva materia
+        </div>
+        <div class="card-body">
+            <form id="formMateria">
+                <input type="hidden" id="materiaId" value="">
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Nombre de la materia *</label>
+                        <input type="text" class="form-control" id="nombre" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Orden</label>
+                        <input type="number" class="form-control" id="orden" value="99" min="1">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Ruta de imagen</label>
+                        <input type="text" class="form-control" id="imagen" value="assets/images/programacion.jpg">
+                        <small class="text-muted">Ej: assets/images/programacion.jpg</small>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save me-2"></i> Guardar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnCancelar" style="display:none;">
+                        Cancelar edición
+                    </button>
+                </div>
+            </form>
+            <div id="mensajeForm" class="mt-3" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Tabla de materias -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-book me-2"></i> Materias registradas</span>
+            <div>
+                <button class="btn btn-sm btn-outline-success me-2" id="btnSembrar">
+                    <i class="fas fa-seedling"></i> Sembrar 8 iniciales
+                </button>
+                <button class="btn btn-sm btn-outline-primary" id="btnRefrescar">
+                    <i class="fas fa-sync-alt"></i> Refrescar
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:60px;">Orden</th>
+                            <th>Materia</th>
+                            <th>Descripción</th>
+                            <th style="width:180px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaMaterias">
+                        <tr><td colspan="4" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Gestión de Materias
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { logout } from "../js/auth.js";
+    import {
+        listarMaterias,
+        crearMateria,
+        actualizarMateria,
+        borrarMateria,
+        sembrarMateriasIniciales
+    } from "../js/materias.js";
+
+    // Solo admin y supervisor pueden gestionar materias.
+// Protegemos contra alumno: si es alumno, va a su panel.
+import { observarSesion } from "../js/auth.js";
+
+observarSesion(({ logueado, user, rol }) => {
+    if (!logueado) return;
+    if (rol !== "admin" && rol !== "supervisor") {
+        window.location.href = "../pages/dashboard.html";
+    }
+});
+
+    // --- Cerrar sesión ---
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // --- Utilidades ---
+    function mostrarMsg(texto, tipo) {
+        const msg = document.getElementById("mensajeForm");
+        msg.style.display = "block";
+        msg.className = tipo === "ok" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
+        msg.textContent = texto;
+    }
+
+    // --- Formulario ---
+    const formMateria   = document.getElementById("formMateria");
+    const tituloForm    = document.getElementById("tituloForm");
+    const btnGuardar    = document.getElementById("btnGuardar");
+    const btnCancelar   = document.getElementById("btnCancelar");
+    const inputId       = document.getElementById("materiaId");
+    const inputNombre   = document.getElementById("nombre");
+    const inputDesc     = document.getElementById("descripcion");
+    const inputImagen   = document.getElementById("imagen");
+    const inputOrden    = document.getElementById("orden");
+
+    function resetForm() {
+        formMateria.reset();
+        inputId.value = "";
+        inputImagen.value = "assets/images/programacion.jpg";
+        inputOrden.value = 99;
+        tituloForm.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Crear nueva materia';
+        btnGuardar.innerHTML = '<i class="fas fa-save me-2"></i> Guardar';
+        btnCancelar.style.display = "none";
+    }
+
+    btnCancelar.addEventListener("click", resetForm);
+
+    formMateria.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = inputId.value;
+        const datos = {
+            nombre: inputNombre.value.trim(),
+            descripcion: inputDesc.value.trim(),
+            imagen: inputImagen.value.trim(),
+            orden: Number(inputOrden.value) || 99
+        };
+
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+
+        let res;
+        if (id) {
+            res = await actualizarMateria(id, datos);
+        } else {
+            res = await crearMateria(datos);
+        }
+
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = '<i class="fas fa-save me-2"></i> Guardar';
+
+        if (res.ok) {
+            mostrarMsg(id ? "Materia actualizada" : "Materia creada correctamente", "ok");
+            resetForm();
+            cargarMaterias();
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    // --- Cargar materias ---
+    async function cargarMaterias() {
+        const tbody = document.getElementById("tablaMaterias");
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Cargando...</td></tr>';
+
+        const res = await listarMaterias();
+
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${res.error}</td></tr>`;
+            return;
+        }
+
+        if (res.materias.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay materias. Usa "Sembrar 8 iniciales" o crea una manualmente.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        res.materias.forEach((m) => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+                <td><span class="badge bg-secondary">${m.orden ?? "—"}</span></td>
+                <td><strong>${m.nombre || "—"}</strong></td>
+                <td class="text-muted small">${(m.descripcion || "").substring(0, 80)}...</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary btn-editar me-1" data-id="${m.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger btn-borrar" data-id="${m.id}" data-nombre="${m.nombre}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+        });
+
+        // Listeners de editar
+        tbody.querySelectorAll(".btn-editar").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const materia = res.materias.find((m) => m.id === id);
+                if (!materia) return;
+
+                inputId.value = materia.id;
+                inputNombre.value = materia.nombre || "";
+                inputDesc.value = materia.descripcion || "";
+                inputImagen.value = materia.imagen || "assets/images/programacion.jpg";
+                inputOrden.value = materia.orden || 99;
+
+                tituloForm.innerHTML = '<i class="fas fa-edit me-2"></i> Editando materia';
+                btnGuardar.innerHTML = '<i class="fas fa-save me-2"></i> Actualizar';
+                btnCancelar.style.display = "inline-block";
+
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        });
+
+        // Listeners de borrar
+        tbody.querySelectorAll(".btn-borrar").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                const nombre = btn.dataset.nombre;
+                if (!confirm(`¿Borrar la materia "${nombre}"? Esta acción no se puede deshacer.`)) return;
+
+                const r = await borrarMateria(id);
+                if (r.ok) cargarMaterias();
+                else alert(r.error);
+            });
+        });
+    }
+
+    // --- Botones superiores ---
+    document.getElementById("btnRefrescar").addEventListener("click", cargarMaterias);
+
+    document.getElementById("btnSembrar").addEventListener("click", async () => {
+        if (!confirm("Esto creará las 8 materias iniciales. ¿Continuar?")) return;
+
+        const btn = document.getElementById("btnSembrar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sembrando...';
+
+        const res = await sembrarMateriasIniciales();
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-seedling"></i> Sembrar 8 iniciales';
+
+        if (res.ok) {
+            alert(`✅ Se crearon ${res.cantidad} materias.`);
+            cargarMaterias();
+        } else {
+            alert(`❌ ${res.error}`);
+        }
+    });
+
+    // Carga inicial
+    cargarMaterias();
+</script>
+
+</body>
+</html>

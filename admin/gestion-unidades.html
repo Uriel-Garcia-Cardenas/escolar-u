@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Unidades - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · GESTIÓN DE UNIDADES</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard-admin.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Selección de materia -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <label class="form-label"><strong>Selecciona una materia</strong></label>
+            <select class="form-select" id="selectorMateria">
+                <option value="">Cargando materias...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="card mb-4" id="panelAcciones" style="display:none;">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-1" id="tituloMateriaSeleccionada">—</h5>
+                <small class="text-muted" id="infoUnidades">0 unidades</small>
+            </div>
+                        <div>
+                <a href="#" id="btnVerComoAlumno" class="btn btn-outline-primary me-2" target="_blank">
+                    <i class="fas fa-eye"></i> Ver como alumno
+                </a>
+                <button class="btn btn-outline-success me-2" id="btnSeed">
+                    <i class="fas fa-seedling"></i> Sembrar 5 de ejemplo
+                </button>
+                <button class="btn btn-primary" id="btnNueva">
+                    <i class="fas fa-plus"></i> Nueva unidad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario crear/editar -->
+    <div class="card mb-4" id="panelForm" style="display:none;">
+        <div class="card-header" id="tituloForm">
+            <i class="fas fa-plus-circle me-2"></i> Nueva unidad
+        </div>
+        <div class="card-body">
+            <form id="formUnidad">
+                <input type="hidden" id="unidadId" value="">
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Título de la unidad *</label>
+                        <input type="text" class="form-control" id="titulo" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Orden</label>
+                        <input type="number" class="form-control" id="orden" value="1" min="1">
+                    </div>
+                     <div class="col-12">
+    <label class="form-label">Tipo de plantilla *</label>
+                <select class="form-select" id="plantilla" required>
+    <option value="">Selecciona...</option>
+    <option value="hoja">📄 Hoja en blanco</option>
+    <option value="imagen">Imagen (URL)</option>
+    <option value="video">Video</option>
+    <option value="tarjetas">Tarjetas</option>
+    <option value="acordeon">Acordeón</option>
+    <option value="tabs">Pestañas</option>
+    <option value="timeline">Línea de tiempo</option>
+    <option value="documento">📄 Documento (PDF, Word, Excel)</option>
+    
+</select>
+</div>
+                </div>
+
+                                <!-- Editor dinámico + Vista previa -->
+                <div class="row g-4 mt-3">
+                    <!-- Columna: editor -->
+                    <div class="col-lg-7">
+                        <div class="border rounded p-3 bg-white">
+                            <h6 class="mb-3 text-muted"><i class="fas fa-pen me-1"></i> Editor de contenido</h6>
+                            <div id="editorContenido">
+                                <p class="text-muted small">Selecciona un tipo de plantilla para editar el contenido.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna: vista previa -->
+                    <div class="col-lg-5">
+                        <div class="border rounded p-3 bg-light sticky-preview">
+                            <h6 class="mb-3 text-muted d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-eye me-1"></i> Vista previa</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnRefrescarPreview">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </h6>
+                            <div id="previewUnidad" class="preview-container">
+                                <p class="text-muted small text-center py-4">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Completa el título y el contenido para ver la vista previa.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save me-1"></i> Guardar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnCancelar">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+            <div id="mensajeForm" class="mt-3" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Lista de unidades -->
+    <div class="card" id="panelLista" style="display:none;">
+        <div class="card-header">
+            <i class="fas fa-list me-2"></i> Unidades de la materia
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:60px;">Orden</th>
+                            <th>Título</th>
+                            <th style="width:120px;">Plantilla</th>
+                            <th style="width:150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUnidades">
+                        <tr><td colspan="4" class="text-center text-muted py-4">Sin unidades</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Gestión de Unidades
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { logout } from "../js/auth.js";
+    import { listarMaterias } from "../js/materias.js";
+    import { renderizarUnidad } from "../js/render.js";
+    import {
+        listarUnidades, crearUnidad, actualizarUnidad,
+        borrarUnidad, sembrarUnidadesEjemplo
+    } from "../js/unidades.js";
+
+    // Solo admin y supervisor pueden gestionar materias.
+// Protegemos contra alumno: si es alumno, va a su panel.
+import { observarSesion } from "../js/auth.js";
+
+observarSesion(({ logueado, user, rol }) => {
+    if (!logueado) return;
+    if (rol !== "admin" && rol !== "supervisor") {
+        window.location.href = "../pages/dashboard.html";
+    }
+});
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // ---------- Estado ----------
+    let materiaId = null;
+    let unidades = [];
+
+    // ------------------------------------------------------------
+// Convierte links de Drive u otros a URLs directas de imagen
+// ------------------------------------------------------------
+function convertirUrlImagen(url) {
+    if (!url) return "";
+
+    const u = url.trim();
+
+    // Google Drive: /file/d/ID/view o ?id=ID
+    let m = u.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/);
+    if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+    m = u.match(/drive\.google\.com\/open\?id=([A-Za-z0-9_-]+)/);
+    if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+    m = u.match(/drive\.google\.com\/uc\?.*id=([A-Za-z0-9_-]+)/);
+    if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+    // Google Docs (si compartes desde Docs)
+    m = u.match(/docs\.google\.com\/.*\/d\/([A-Za-z0-9_-]+)/);
+    if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
+
+    // Dropbox: forzar descarga directa
+    if (u.includes("dropbox.com")) {
+        return u.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
+    }
+
+    // Cualquier otro enlace: se usa tal cual (Imgur, ImgBB, etc.)
+    return u;
+}
+
+    // ---------- Cargar materias en el selector ----------
+    async function cargarMaterias() {
+        const sel = document.getElementById("selectorMateria");
+        const res = await listarMaterias();
+
+        if (!res.ok) {
+            sel.innerHTML = `<option>Error: ${res.error}</option>`;
+            return;
+        }
+
+        sel.innerHTML = '<option value="">— Selecciona una materia —</option>';
+        res.materias.forEach((m) => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = m.nombre;
+            sel.appendChild(opt);
+        });
+    }
+
+        // ---------- Cuando cambia la materia seleccionada ----------
+    document.getElementById("selectorMateria").addEventListener("change", (e) => {
+        materiaId = e.target.value;
+        const btnVer = document.getElementById("btnVerComoAlumno");
+        
+        if (!materiaId) {
+            ocultarTodo();
+            btnVer.href = "#";
+            return;
+        }
+        
+        // Actualizar el enlace del botón para que abra la materia seleccionada
+        btnVer.href = `../pages/materia.html?id=${materiaId}`;
+        
+        mostrarPaneles();
+        cargarUnidades();
+    });
+
+    function mostrarPaneles() {
+        document.getElementById("panelAcciones").style.display = "block";
+        document.getElementById("panelLista").style.display = "block";
+        document.getElementById("panelForm").style.display = "none";
+    }
+
+    function ocultarTodo() {
+        document.getElementById("panelAcciones").style.display = "none";
+        document.getElementById("panelLista").style.display = "none";
+        document.getElementById("panelForm").style.display = "none";
+    }
+
+    // ---------- Cargar unidades ----------
+    async function cargarUnidades() {
+        const tbody = document.getElementById("tablaUnidades");
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Cargando...</td></tr>';
+
+        const res = await listarUnidades(materiaId);
+
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${res.error}</td></tr>`;
+            return;
+        }
+
+        unidades = res.unidades;
+
+        const titulo = document.getElementById("tituloMateriaSeleccionada");
+        const info = document.getElementById("infoUnidades");
+        const sel = document.getElementById("selectorMateria");
+        titulo.textContent = sel.options[sel.selectedIndex].textContent;
+        info.textContent = `${unidades.length} unidad(es)`;
+
+        if (unidades.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Aún no hay unidades. Crea una o usa "Sembrar 5 de ejemplo".</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        unidades.forEach((u) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><span class="badge bg-secondary">${u.orden ?? "—"}</span></td>
+                <td><strong>${u.titulo || "—"}</strong></td>
+                <td><span class="badge bg-info text-dark">${u.plantilla || "—"}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary btn-editar me-1" data-id="${u.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger btn-borrar" data-id="${u.id}" data-titulo="${u.titulo}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll(".btn-editar").forEach((b) => {
+            b.addEventListener("click", () => editarUnidad(b.dataset.id));
+        });
+        tbody.querySelectorAll(".btn-borrar").forEach((b) => {
+            b.addEventListener("click", () => eliminarUnidad(b.dataset.id, b.dataset.titulo));
+        });
+    }
+
+    // ---------- Nueva unidad ----------
+        // ---------- Nueva unidad ----------
+    document.getElementById("btnNueva").addEventListener("click", () => {
+        document.getElementById("unidadId").value = "";
+        document.getElementById("titulo").value = "";
+        document.getElementById("orden").value = unidades.length + 1;
+        document.getElementById("plantilla").value = "";
+        document.getElementById("editorContenido").innerHTML =
+            '<p class="text-muted">Selecciona un tipo de plantilla para editar el contenido.</p>';
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-plus-circle me-2"></i> Nueva unidad';
+        document.getElementById("panelForm").style.display = "block";
+        document.getElementById("panelForm").scrollIntoView({ behavior: "smooth" });
+
+        // ⬇️ LÍNEA NUEVA: limpia la vista previa
+        actualizarPreview();
+    });
+
+    // ---------- Cancelar ----------
+    document.getElementById("btnCancelar").addEventListener("click", () => {
+        document.getElementById("panelForm").style.display = "none";
+         resetForm();
+    });
+
+    // ---------- Cambio de plantilla → editor dinámico ----------
+    document.getElementById("plantilla").addEventListener("change", (e) => {
+        pintarEditor(e.target.value, {});
+    });
+
+    function pintarEditor(plantilla, contenido) {
+        const cont = document.getElementById("editorContenido");
+
+        if (!plantilla) {
+            cont.innerHTML = '<p class="text-muted">Selecciona un tipo de plantilla.</p>';
+            return;
+        }
+
+                if (plantilla === "hoja") {
+            const tituloActual    = contenido.titulo    || "";
+            const subtituloActual = contenido.subtitulo || "";
+            const textoActual     = contenido.texto     || "";
+
+            cont.innerHTML = `
+                <h6><i class="fas fa-file-alt me-1"></i> Hoja en blanco</h6>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Título de la hoja *</label>
+                        <input type="text" class="form-control form-control-lg" id="hojaTitulo"
+                               placeholder="Ej: Introducción a la programación"
+                               maxlength="120"
+                               value="${tituloActual}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Subtítulo (opcional)</label>
+                        <input type="text" class="form-control" id="hojaSubtitulo"
+                               placeholder="Ej: Unidad 1 — Conceptos básicos"
+                               maxlength="160"
+                               value="${subtituloActual}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Contenido *</label>
+                        <textarea class="form-control hoja-textarea" id="hojaTexto"
+                                  rows="14"
+                                  placeholder="Escribe aquí tu contenido. Puedes usar saltos de línea, viñetas, párrafos...">${textoActual}</textarea>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">
+                                Acepta saltos de línea. Cada línea vacía se convierte en un espacio.
+                            </small>
+                            <small class="text-muted">
+                                <span id="hojaContador">0</span> caracteres
+                            </small>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Contador de caracteres
+            const txt = document.getElementById("hojaTexto");
+            const contador = document.getElementById("hojaContador");
+            if (contador) contador.textContent = txt.value.length;
+            txt.addEventListener("input", () => {
+                contador.textContent = txt.value.length;
+            });
+        }
+
+        if (plantilla === "acordeon") {
+            const secs = contenido.secciones || [{ titulo: "", texto: "" }];
+            cont.innerHTML = `
+                <h6>Secciones del acordeón</h6>
+                <div id="listaSecciones"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addSeccion">
+                    <i class="fas fa-plus"></i> Agregar sección
+                </button>`;
+            pintarSecciones(secs);
+            document.getElementById("addSeccion").addEventListener("click", () => {
+                const actuales = leerSecciones();
+                actuales.push({ titulo: "", texto: "" });
+                pintarSecciones(actuales);
+            });
+        }
+
+
+        if (plantilla === "tabs") {
+            const tabs = contenido.pestanas || [{ nombre: "", texto: "" }];
+            cont.innerHTML = `
+                <h6>Pestañas</h6>
+                <div id="listaPestanas"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addPestana">
+                    <i class="fas fa-plus"></i> Agregar pestaña
+                </button>`;
+            pintarPestanas(tabs);
+            document.getElementById("addPestana").addEventListener("click", () => {
+                const actuales = leerPestanas();
+                actuales.push({ nombre: "", texto: "" });
+                pintarPestanas(actuales);
+            });
+        }
+
+                if (plantilla === "tarjetas") {
+            const tarjetas = contenido.tarjetas || [{ titulo: "", descripcion: "", imagen: "" }];
+            cont.innerHTML = `
+                <h6>Tarjetas</h6>
+                <div id="listaTarjetas"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addTarjeta">
+                    <i class="fas fa-plus"></i> Agregar tarjeta
+                </button>`;
+            pintarTarjetas(tarjetas);
+            document.getElementById("addTarjeta").addEventListener("click", () => {
+                const actuales = leerTarjetas();
+                actuales.push({ titulo: "", descripcion: "", imagen: "" });
+                pintarTarjetas(actuales);
+            });
+        }
+
+        if (plantilla === "timeline") {
+            const eventos = contenido.eventos || [{ titulo: "", texto: "" }];
+            cont.innerHTML = `
+                <h6>Eventos de la línea de tiempo</h6>
+                <div id="listaEventos"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addEvento">
+                    <i class="fas fa-plus"></i> Agregar evento
+                </button>`;
+            pintarEventos(eventos);
+            document.getElementById("addEvento").addEventListener("click", () => {
+                const actuales = leerEventos();
+                actuales.push({ titulo: "", texto: "" });
+                pintarEventos(actuales);
+            });
+        }
+
+                if (plantilla === "video") {
+            const urlActual = contenido.url || "";
+            cont.innerHTML = `
+                <h6>Video</h6>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">URL del video</label>
+                        <input type="text" class="form-control" id="videoUrl"
+                               placeholder="https://www.youtube.com/watch?v=xxxxx  o  https://youtu.be/xxxxx"
+                               value="${urlActual}">
+                        <small class="text-muted">
+                            Acepta YouTube normal, YouTube corto (youtu.be), Shorts, Vimeo o Google Drive.
+                        </small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="videoDesc"
+                               value="${contenido.descripcion || ""}">
+                    </div>
+                    <div class="col-12 mt-2" id="videoPreview">
+                        <p class="text-muted small">Vista previa aparecerá aquí.</p>
+                    </div>
+                </div>`;
+
+            // Vista previa en vivo del video
+            import("../js/render.js").then(({ normalizarUrlVideo }) => {
+                const input = document.getElementById("videoUrl");
+                const preview = document.getElementById("videoPreview");
+
+                function actualizar() {
+                    const emb = normalizarUrlVideo(input.value);
+                    preview.innerHTML = emb
+                        ? `<div class="ratio ratio-16x9" style="max-width:600px;">
+                              <iframe src="${emb}"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowfullscreen></iframe>
+                           </div>`
+                        : '<p class="text-muted small">Vista previa aparecerá aquí.</p>';
+                }
+
+                actualizar();
+                input.addEventListener("input", actualizar);
+            });
+        }
+
+        if (plantilla === "imagen") {
+            const urlActual  = contenido.url || "";
+            const descActual = contenido.descripcion || "";
+
+            cont.innerHTML = `
+                <h6>Imagen desde URL</h6>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Enlace de la imagen *</label>
+                        <input type="text" class="form-control" id="imgUrl"
+                               placeholder="https://drive.google.com/file/d/XXXX/view  o  https://i.imgur.com/XXXX.jpg"
+                               value="${urlActual}">
+                        <small class="text-muted">
+                            Acepta <strong>Google Drive</strong>, <strong>ImgBB</strong>, <strong>Imgur</strong> o cualquier URL directa de imagen.
+                        </small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción (opcional)</label>
+                        <textarea class="form-control" id="imgDesc" rows="2"
+                                  placeholder="Texto que aparecerá debajo de la imagen">${descActual}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <div id="imgPreview" class="text-center mt-2">
+                            ${urlActual
+                                ? `<img src="${convertirUrlImagen(urlActual)}"
+                                        class="img-fluid rounded shadow-sm"
+                                        style="max-height:300px; object-fit:contain;">`
+                                : '<p class="text-muted small">La vista previa aparecerá aquí al pegar un enlace.</p>'}
+                        </div>
+                    </div>
+                </div>`;
+
+            // Vista previa en vivo
+            const input = document.getElementById("imgUrl");
+            const preview = document.getElementById("imgPreview");
+
+            input.addEventListener("input", () => {
+                const url = input.value.trim();
+                if (!url) {
+                    preview.innerHTML = '<p class="text-muted small">La vista previa aparecerá aquí al pegar un enlace.</p>';
+                    return;
+                }
+                preview.innerHTML = `
+                    <img src="${convertirUrlImagen(url)}"
+                         class="img-fluid rounded shadow-sm"
+                         style="max-height:300px; object-fit:contain;"
+                         onerror="this.parentElement.innerHTML='<p class=\\'text-danger small\\'>⚠️ No se pudo cargar la imagen. Revisa el enlace.</p>'">`;
+            });
+        }
+
+                if (plantilla === "documento") {
+            const urlActual = contenido.url || "";
+            const descActual = contenido.descripcion || "";
+
+            cont.innerHTML = `
+                <h6>Documento (PDF, Word, Excel, TXT)</h6>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Enlace del documento *</label>
+                        <input type="text" class="form-control" id="docUrl"
+                               placeholder="https://drive.google.com/file/d/XXXX/view  o  https://docs.google.com/..."
+                               value="${urlActual}">
+                        <small class="text-muted">
+                            Pega un enlace de <strong>Google Drive</strong> (asegúrate de que sea público) o cualquier enlace directo a un PDF/Doc.
+                        </small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción (opcional)</label>
+                        <textarea class="form-control" id="docDesc" rows="2"
+                                  placeholder="Instrucciones o descripción del documento">${descActual}</textarea>
+                    </div>
+                </div>`;
+        }
+    }  // ← cierre de pintarEditor
+
+        // ------------------------------------------------------------
+    // VISTA PREVIA EN VIVO
+    // ------------------------------------------------------------
+    function actualizarPreview() {
+        const cont = document.getElementById("previewUnidad");
+        if (!cont) return;
+
+        const titulo    = document.getElementById("titulo").value.trim();
+        const plantilla = document.getElementById("plantilla").value;
+
+        // Si aún no hay plantilla seleccionada
+        if (!plantilla) {
+            cont.innerHTML = `
+                <p class="text-muted small text-center py-4">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Selecciona un tipo de plantilla para ver la vista previa.
+                </p>`;
+            return;
+        }
+
+        // Recolectamos el contenido actual según la plantilla
+        let contenido = {};
+        try {
+            if (plantilla === "hoja")     contenido = leerHoja();
+            if (plantilla === "acordeon") contenido = { secciones: leerSecciones() };
+            if (plantilla === "tabs")     contenido = { pestanas: leerPestanas() };
+            if (plantilla === "tarjetas") contenido = { tarjetas: leerTarjetas() };
+            if (plantilla === "timeline") contenido = { eventos: leerEventos() };
+            if (plantilla === "video") {
+                contenido = {
+                    url: document.getElementById("videoUrl")?.value.trim() || "",
+                    descripcion: document.getElementById("videoDesc")?.value.trim() || ""
+                };
+            }
+            if (plantilla === "imagen") {
+                contenido = {
+                    url: document.getElementById("imgUrl")?.value.trim() || "",
+                    descripcion: document.getElementById("imgDesc")?.value.trim() || ""
+                };
+            }
+                        if (plantilla === "documento") {
+                contenido = {
+                    url: document.getElementById("docUrl")?.value.trim() || "",
+                    descripcion: document.getElementById("docDesc")?.value.trim() || ""
+                };
+            }
+        } catch (_) {
+            // Si algún sub-editor no está listo, no rompemos
+            contenido = {};
+        }
+
+        // Construimos el objeto "unidad" simulado
+        const unidadFalsa = {
+            id: "preview",
+            titulo: titulo || "(sin título)",
+            plantilla,
+            contenido
+        };
+
+        // Renderizamos con la misma función que usa el alumno
+        cont.innerHTML = renderizarUnidad(unidadFalsa, 999);
+    }
+    
+
+    // ---------- Sub-editores ----------
+
+    // Acordeón
+    function pintarSecciones(secs) {
+        const cont = document.getElementById("listaSecciones");
+        cont.innerHTML = "";
+        secs.forEach((s, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-2 bg-light";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Sección ${i + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-sec">×</button>
+                </div>
+                <input class="form-control mb-2 input-sec-titulo" placeholder="Título" value="${s.titulo || ""}">
+                <textarea class="form-control input-sec-texto" rows="2" placeholder="Texto">${s.texto || ""}</textarea>`;
+            cont.appendChild(div);
+        });
+        cont.querySelectorAll(".btn-quitar-sec").forEach((b) => {
+            b.addEventListener("click", () => {
+                const actuales = leerSecciones();
+                const idx = Array.from(cont.children).indexOf(b.closest(".border"));
+                actuales.splice(idx, 1);
+                if (actuales.length === 0) actuales.push({ titulo: "", texto: "" });
+                pintarSecciones(actuales);
+            });
+        });
+    }
+    function leerSecciones() {
+        const cont = document.getElementById("listaSecciones");
+        const out = [];
+        cont.querySelectorAll(".border").forEach((d) => {
+            out.push({
+                titulo: d.querySelector(".input-sec-titulo").value.trim(),
+                texto:  d.querySelector(".input-sec-texto").value.trim()
+            });
+        });
+        return out;
+    }
+
+    // Tabs
+    function pintarPestanas(tabs) {
+        const cont = document.getElementById("listaPestanas");
+        cont.innerHTML = "";
+        tabs.forEach((p, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-2 bg-light";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Pestaña ${i + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-tab">×</button>
+                </div>
+                <input class="form-control mb-2 input-tab-nombre" placeholder="Nombre" value="${p.nombre || ""}">
+                <textarea class="form-control input-tab-texto" rows="2" placeholder="Texto">${p.texto || ""}</textarea>`;
+            cont.appendChild(div);
+        });
+        cont.querySelectorAll(".btn-quitar-tab").forEach((b) => {
+            b.addEventListener("click", () => {
+                const actuales = leerPestanas();
+                const idx = Array.from(cont.children).indexOf(b.closest(".border"));
+                actuales.splice(idx, 1);
+                if (actuales.length === 0) actuales.push({ nombre: "", texto: "" });
+                pintarPestanas(actuales);
+            });
+        });
+    }
+    function leerPestanas() {
+        const cont = document.getElementById("listaPestanas");
+        const out = [];
+        cont.querySelectorAll(".border").forEach((d) => {
+            out.push({
+                nombre: d.querySelector(".input-tab-nombre").value.trim(),
+                texto:  d.querySelector(".input-tab-texto").value.trim()
+            });
+        });
+        return out;
+    }
+
+        // Tarjetas
+    function pintarTarjetas(tarjetas) {
+        const cont = document.getElementById("listaTarjetas");
+        cont.innerHTML = "";
+        tarjetas.forEach((t, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-2 bg-light";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Tarjeta ${i + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-tarj">×</button>
+                </div>
+                <input class="form-control mb-2 input-t-titulo" placeholder="Título" value="${t.titulo || ""}">
+                <textarea class="form-control mb-2 input-t-desc" rows="2" placeholder="Descripción">${t.descripcion || ""}</textarea>
+                <input class="form-control input-t-imagen" placeholder="URL de imagen (opcional)" value="${t.imagen || ""}">
+                <small class="text-muted">Pega una URL de Drive, ImgBB, Imgur o cualquier imagen directa.</small>`;
+            cont.appendChild(div);
+        });
+        cont.querySelectorAll(".btn-quitar-tarj").forEach((b) => {
+            b.addEventListener("click", () => {
+                const actuales = leerTarjetas();
+                const idx = Array.from(cont.children).indexOf(b.closest(".border"));
+                actuales.splice(idx, 1);
+                if (actuales.length === 0) actuales.push({ titulo: "", descripcion: "", imagen: "" });
+                pintarTarjetas(actuales);
+            });
+        });
+    }
+
+    function leerTarjetas() {
+        const cont = document.getElementById("listaTarjetas");
+        const out = [];
+        cont.querySelectorAll(".border").forEach((d) => {
+            out.push({
+                titulo:      d.querySelector(".input-t-titulo").value.trim(),
+                descripcion: d.querySelector(".input-t-desc").value.trim(),
+                imagen:      d.querySelector(".input-t-imagen").value.trim()
+            });
+        });
+        return out;
+    }
+
+        // Hoja en blanco
+    function leerHoja() {
+        return {
+            titulo:    document.getElementById("hojaTitulo")?.value.trim()    || "",
+            subtitulo: document.getElementById("hojaSubtitulo")?.value.trim() || "",
+            texto:     document.getElementById("hojaTexto")?.value            || ""
+        };
+    }
+
+    // Timeline
+    function pintarEventos(eventos) {
+        const cont = document.getElementById("listaEventos");
+        cont.innerHTML = "";
+        eventos.forEach((e, i) => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-2 bg-light";
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Evento ${i + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-quitar-evt">×</button>
+                </div>
+                <input class="form-control mb-2 input-e-titulo" placeholder="Título" value="${e.titulo || ""}">
+                <textarea class="form-control input-e-texto" rows="2" placeholder="Texto">${e.texto || ""}</textarea>`;
+            cont.appendChild(div);
+        });
+        cont.querySelectorAll(".btn-quitar-evt").forEach((b) => {
+            b.addEventListener("click", () => {
+                const actuales = leerEventos();
+                const idx = Array.from(cont.children).indexOf(b.closest(".border"));
+                actuales.splice(idx, 1);
+                if (actuales.length === 0) actuales.push({ titulo: "", texto: "" });
+                pintarEventos(actuales);
+            });
+        });
+    }
+    
+    function leerEventos() {
+        const cont = document.getElementById("listaEventos");
+        const out = [];
+        cont.querySelectorAll(".border").forEach((d) => {
+            out.push({
+                titulo: d.querySelector(".input-e-titulo").value.trim(),
+                texto:  d.querySelector(".input-e-texto").value.trim()
+            });
+        });
+        return out;
+    }
+
+    // ---------- Editar unidad ----------
+    function editarUnidad(id) {
+        const u = unidades.find((x) => x.id === id);
+        if (!u) return;
+
+        document.getElementById("unidadId").value = u.id;
+        document.getElementById("titulo").value = u.titulo || "";
+        document.getElementById("orden").value = u.orden || 1;
+        document.getElementById("plantilla").value = u.plantilla || "";
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-edit me-2"></i> Editar unidad';
+
+        pintarEditor(u.plantilla, u.contenido || {});
+        document.getElementById("panelForm").style.display = "block";
+        document.getElementById("panelForm").scrollIntoView({ behavior: "smooth" });
+                // Refrescar preview tras cargar los datos en el editor
+        setTimeout(actualizarPreview, 100);
+    }
+
+    // ---------- Eliminar ----------
+    async function eliminarUnidad(id, titulo) {
+        if (!confirm(`¿Borrar la unidad "${titulo}"?`)) return;
+        const res = await borrarUnidad(id);
+        if (res.ok) cargarUnidades();
+        else alert(res.error);
+    }
+
+        document.getElementById("formUnidad").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById("unidadId").value;
+        const plantilla = document.getElementById("plantilla").value;
+        const titulo = document.getElementById("titulo").value.trim();
+        const orden = Number(document.getElementById("orden").value) || 99;
+
+        if (!plantilla) {
+            alert("Selecciona un tipo de plantilla");
+            return;
+        }
+
+        // Recolectar contenido según plantilla
+        let contenido = {};
+        if (plantilla === "hoja")     contenido = leerHoja();
+        if (plantilla === "acordeon") contenido = { secciones: leerSecciones() };
+        if (plantilla === "tabs")     contenido = { pestanas: leerPestanas() };
+        if (plantilla === "tarjetas") contenido = { tarjetas: leerTarjetas() };
+        if (plantilla === "timeline") contenido = { eventos: leerEventos() };
+
+        if (plantilla === "video") {
+            contenido = {
+                url: document.getElementById("videoUrl").value.trim(),
+                descripcion: document.getElementById("videoDesc").value.trim()
+            };
+        }
+
+        if (plantilla === "imagen") {
+            const url = document.getElementById("imgUrl").value.trim();
+            if (!url) {
+                alert("Pega un enlace de imagen");
+                return;
+            }
+            contenido = {
+                url: url,
+                descripcion: document.getElementById("imgDesc").value.trim()
+            };
+        }
+
+                if (plantilla === "documento") {
+            const url = document.getElementById("docUrl").value.trim();
+            if (!url) {
+                alert("Pega un enlace de documento");
+                return;
+            }
+            contenido = {
+                url: url,
+                descripcion: document.getElementById("docDesc").value.trim()
+            };
+        }
+
+        const btn = document.getElementById("btnGuardar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+
+        let res;
+        if (id) {
+            res = await actualizarUnidad(id, { titulo, plantilla, contenido, orden });
+        } else {
+            res = await crearUnidad({ materiaId, titulo, plantilla, contenido, orden });
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save me-1"></i> Guardar';
+
+        if (res.ok) {
+            document.getElementById("panelForm").style.display = "none";
+            cargarUnidades();
+        } else {
+            alert(res.error);
+        }
+    });
+
+    // ---------- Sembrar ejemplo ----------
+    document.getElementById("btnSeed").addEventListener("click", async () => {
+        if (!materiaId) return;
+        if (!confirm("Esto creará 5 unidades de ejemplo. ¿Continuar?")) return;
+
+        const btn = document.getElementById("btnSeed");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sembrando...';
+
+        const res = await sembrarUnidadesEjemplo(materiaId);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-seedling"></i> Sembrar 5 de ejemplo';
+
+        if (res.ok) {
+            alert(`✅ Se crearon ${res.cantidad} unidades.`);
+            cargarUnidades();
+        } else {
+            alert(`❌ ${res.error}`);
+        }
+    });
+
+        // ------------------------------------------------------------
+    // Listeners para vista previa en vivo
+    // ------------------------------------------------------------
+    document.getElementById("titulo").addEventListener("input", actualizarPreview);
+
+    // Cuando cambia la plantilla, se pinta el editor y luego la preview
+    document.getElementById("plantilla").addEventListener("change", () => {
+        // pequeño delay para que pintarEditor termine
+        setTimeout(actualizarPreview, 50);
+    });
+
+    // Refrescar manualmente con el botón
+    document.getElementById("btnRefrescarPreview").addEventListener("click", actualizarPreview);
+
+    // Delegación de eventos: cualquier input/textarea/change dentro del editor dispara la preview
+    document.getElementById("editorContenido").addEventListener("input", (e) => {
+        if (e.target.matches("input, textarea, select")) {
+            actualizarPreview();
+        }
+    });
+    document.getElementById("editorContenido").addEventListener("change", (e) => {
+        if (e.target.matches("input, textarea, select")) {
+            actualizarPreview();
+        }
+    });
+
+    // Cuando se agrega o quita una sección/tarjeta/pestaña, también refrescar
+    // (los botones de "Agregar" y "×" no disparan "input" por sí solos)
+    document.getElementById("editorContenido").addEventListener("click", (e) => {
+        if (e.target.closest("button")) {
+            setTimeout(actualizarPreview, 100);
+        }
+    });
+
+        function resetForm() {
+        document.getElementById("formUnidad").reset();
+        document.getElementById("unidadId").value = "";
+        document.getElementById("editorContenido").innerHTML =
+            '<p class="text-muted small">Selecciona un tipo de plantilla para editar el contenido.</p>';
+        document.getElementById("tituloForm").innerHTML =
+            '<i class="fas fa-plus-circle me-2"></i> Nueva unidad';
+        document.getElementById("btnGuardar").innerHTML =
+            '<i class="fas fa-save me-1"></i> Guardar';
+        actualizarPreview();
+    }
+    // ---------- Inicial ----------
+    cargarMaterias();
+</script>
+
+</body>
+</html>

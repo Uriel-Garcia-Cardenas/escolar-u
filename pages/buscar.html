@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · BÚSQUEDA</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Barra de búsqueda -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="formBuscar" class="d-flex gap-2">
+                <input type="text" class="form-control form-control-lg" id="inputBuscar"
+                       placeholder="Busca materias, unidades, anuncios..." autofocus>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="panelResultados">
+        <p class="text-muted text-center py-5">Escribe al menos 2 caracteres para buscar.</p>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Búsqueda
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { observarSesion, logout } from "../js/auth.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+    import { buscarGlobal } from "../js/busqueda.js";
+
+    // Cerrar sesión
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // Guardia propia: cualquier logueado
+    let ctx = { uid: null, rol: null, materiasPermitidas: [] };
+
+    observarSesion(async ({ logueado, user, rol }) => {
+        if (!logueado) {
+            window.location.href = "../index.html";
+            return;
+        }
+
+        // Guardar contexto
+        ctx.uid = user.uid;
+        ctx.rol = rol;
+
+        // Si es alumno, leer sus materias
+        if (rol === "alumno") {
+            const res = await obtenerUsuario(user.uid);
+            if (res.ok) ctx.materiasPermitidas = res.usuario.materiasAsignadas || [];
+        }
+
+        // Si la URL trae ?q= algo, buscar de inmediato
+        const params = new URLSearchParams(window.location.search);
+        const qInicial = params.get("q") || "";
+        if (qInicial) {
+            document.getElementById("inputBuscar").value = qInicial;
+            ejecutarBusqueda(qInicial);
+        }
+    });
+
+    // Submit del form
+    document.getElementById("formBuscar").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const t = document.getElementById("inputBuscar").value.trim();
+        // Actualiza la URL sin recargar
+        const url = new URL(window.location.href);
+        url.searchParams.set("q", t);
+        window.history.replaceState({}, "", url);
+        ejecutarBusqueda(t);
+    });
+
+    // ------------------------------------------------------------
+    // Ejecutar la búsqueda
+    // ------------------------------------------------------------
+    async function ejecutarBusqueda(termino) {
+        const panel = document.getElementById("panelResultados");
+
+        if (!termino || termino.trim().length < 2) {
+            panel.innerHTML = '<p class="text-muted text-center py-5">Escribe al menos 2 caracteres.</p>';
+            return;
+        }
+
+        panel.innerHTML = '<p class="text-muted text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i>Buscando...</p>';
+
+        const res = await buscarGlobal(termino, {
+            rol: ctx.rol,
+            materiasPermitidas: ctx.materiasPermitidas
+        });
+
+        // Contar resultados
+        const total =
+            res.materias.length +
+            res.unidades.length +
+            res.anuncios.length +
+            res.usuarios.length;
+
+        if (total === 0) {
+            panel.innerHTML = `
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-search me-2"></i>
+                    No se encontraron resultados para "<strong>${termino}</strong>".
+                </div>`;
+            return;
+        }
+
+        // Pintar secciones
+        panel.innerHTML = `
+            <p class="text-muted mb-3">
+                <strong>${total}</strong> resultado(s) para "<strong>${termino}</strong>":
+            </p>
+        `;
+
+        if (res.materias.length) panel.innerHTML += seccionMaterias(res.materias);
+        if (res.unidades.length) panel.innerHTML += seccionUnidades(res.unidades, res.materias);
+        if (res.anuncios.length) panel.innerHTML += seccionAnuncios(res.anuncios);
+        if (res.usuarios.length) panel.innerHTML += seccionUsuarios(res.usuarios);
+    }
+
+    // ------------------------------------------------------------
+    // Secciones de resultados
+    // ------------------------------------------------------------
+    function seccionMaterias(lista) {
+        let html = `
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-book me-2"></i> Materias (${lista.length})
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">`;
+        lista.forEach((m) => {
+            // Si es alumno y la materia no está asignada, no la linkeamos
+            const puedeEntrar = ctx.rol === "alumno"
+                ? ctx.materiasPermitidas.includes(m.id)
+                : true;
+
+            html += `
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${m.nombre}</strong>
+                        <div class="text-muted small">${(m.descripcion || "").substring(0, 100)}...</div>
+                    </div>
+                    ${puedeEntrar
+                        ? `<a class="btn btn-sm btn-outline-primary" href="materia.html?id=${m.id}">Abrir</a>`
+                        : `<span class="badge bg-secondary">No asignada</span>`}
+                </li>`;
+        });
+        html += `</ul></div></div>`;
+        return html;
+    }
+
+    function seccionUnidades(lista, materias) {
+        // Mapa id→nombre
+        const mapMat = {};
+        (materias || []).forEach((m) => mapMat[m.id] = m.nombre);
+
+        let html = `
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-layer-group me-2"></i> Unidades (${lista.length})
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">`;
+        lista.forEach((u) => {
+            const puedeEntrar = ctx.rol === "alumno"
+                ? ctx.materiasPermitidas.includes(u.materiaId)
+                : true;
+
+            html += `
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${u.titulo || "Sin título"}</strong>
+                        <div class="text-muted small">
+                            Plantilla: <span class="badge bg-info text-dark">${u.plantilla || "—"}</span>
+                            ${mapMat[u.materiaId] ? ` · Materia: ${mapMat[u.materiaId]}` : ""}
+                        </div>
+                    </div>
+                    ${puedeEntrar
+                        ? `<a class="btn btn-sm btn-outline-primary" href="materia.html?id=${u.materiaId}">Abrir materia</a>`
+                        : `<span class="badge bg-secondary">Bloqueada</span>`}
+                </li>`;
+        });
+        html += `</ul></div></div>`;
+        return html;
+    }
+
+    function seccionAnuncios(lista) {
+        let html = `
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-bullhorn me-2"></i> Anuncios (${lista.length})
+                </div>
+                <div class="card-body">`;
+        lista.forEach((a) => {
+            html += `
+                <div class="alert alert-info py-2 mb-2">
+                    <strong>${a.titulo}</strong>
+                    <div class="small mt-1">${a.mensaje}</div>
+                    <div class="text-muted small mt-1">Por ${a.autorEmail || "—"}</div>
+                </div>`;
+        });
+        html += `</div></div>`;
+        return html;
+    }
+
+    function seccionUsuarios(lista) {
+        let html = `
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-users me-2"></i> Usuarios (${lista.length})
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">`;
+        lista.forEach((u) => {
+            html += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${u.nombre || "—"}</strong>
+                        <div class="text-muted small">${u.email || "—"}</div>
+                    </div>
+                    <span class="badge bg-secondary">${u.rol || "—"}</span>
+                </li>`;
+        });
+        html += `</ul></div></div>`;
+        return html;
+    }
+</script>
+
+</body>
+</html>

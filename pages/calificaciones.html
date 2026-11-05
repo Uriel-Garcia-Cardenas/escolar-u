@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Calificaciones - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · MIS CALIFICACIONES</p>
+        </div>
+        <div class="logo logo-right"><img src="../assets/images/escudo_unam.png" alt="UNAM"></div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-2">Mis Calificaciones</h3>
+            <p class="mb-0 text-muted" id="bienvenida">Cargando...</p>
+        </div>
+    </div>
+
+    <!-- BOLETA OFICIAL (Dinámica) -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-line me-2"></i> Boleta Oficial (Parciales)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr id="theadBoleta">
+                            <th>Materia</th>
+                            <!-- Aquí se inyectarán las columnas dinámicas (Parcial 1, Final, etc.) -->
+                            <th style="width:90px;">Promedio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCal">
+                        <tr><td colspan="10" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVIDADES POR MATERIA -->
+    <h4 class="mb-3 mt-5" style="color: var(--azul-oscuro);">
+        <i class="fas fa-tasks me-2"></i> Calificaciones de Actividades
+    </h4>
+    
+    <div id="contenedorActividades">
+        <div class="text-center text-muted py-4">Cargando actividades...</div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Mis Calificaciones
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { observarSesion, logout } from "../js/auth.js";
+    import { listarCalificacionesPorAlumno, calcularPromedio } from "../js/calificaciones.js";
+    import { obtenerUsuario } from "../js/usuarios.js";
+    import { listarTodasEntregasAlumno } from "../js/actividades.js";
+    import { listarMaterias } from "../js/materias.js";
+
+    protegerPagina("alumno", "../");
+
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    function pintarNota(n) {
+        if (typeof n !== "number" || isNaN(n)) return '<span class="text-muted">—</span>';
+        const color = n >= 8 ? "success" : n >= 6 ? "warning" : "danger";
+        return `<span class="badge bg-${color}">${n.toFixed(1)}</span>`;
+    }
+
+    observarSesion(async ({ logueado, user }) => {
+        if (!logueado) return;
+
+        const resU = await obtenerUsuario(user.uid);
+        if (resU.ok) {
+            document.getElementById("bienvenida").textContent = `Alumno: ${resU.usuario.nombre || user.email}`;
+        }
+
+        await cargarBoletaOficial(user.uid);
+        await cargarActividadesPorMateria(user.uid);
+    });
+
+    // ---- 1. Cargar parciales dinámicos ----
+    async function cargarBoletaOficial(uid) {
+        const tbody = document.getElementById("tablaCal");
+        const thead = document.getElementById("theadBoleta");
+        const res = await listarCalificacionesPorAlumno(uid);
+
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">${res.error}</td></tr>`;
+            return;
+        }
+        if (res.calificaciones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Aún no tienes calificaciones registradas.</td></tr>';
+            return;
+        }
+
+        // 1. Detectar todas las columnas (Parciales) que el admin haya configurado
+        let columnasSet = new Set();
+        res.calificaciones.forEach((c) => {
+            let notas = c.notas || {};
+            // Compatibilidad con formato viejo
+            if (Object.keys(notas).length === 0) {
+                if (c.parcial1 != null) notas["Parcial 1"] = c.parcial1;
+                if (c.parcial2 != null) notas["Parcial 2"] = c.parcial2;
+                if (c.parcial3 != null) notas["Parcial 3"] = c.parcial3;
+                if (c.final != null) notas["Final"] = c.final;
+            }
+            // Agregar los nombres de las evaluaciones al Set
+            Object.keys(notas).forEach(ev => columnasSet.add(ev));
+        });
+
+        const columnas = Array.from(columnasSet);
+
+        // 2. Generar los <th> dinámicos
+        let thHTML = "<th>Materia</th>";
+        columnas.forEach(col => {
+            thHTML += `<th style="width:100px;">${col}</th>`;
+        });
+        thHTML += `<th style="width:90px;">Promedio</th>`;
+        thead.innerHTML = thHTML;
+
+        // 3. Generar las filas <tr> y <td>
+        tbody.innerHTML = "";
+        res.calificaciones.forEach((c) => {
+            const prom = calcularPromedio(c);
+            
+            let notas = c.notas || {};
+            if (Object.keys(notas).length === 0) {
+                if (c.parcial1 != null) notas["Parcial 1"] = c.parcial1;
+                if (c.parcial2 != null) notas["Parcial 2"] = c.parcial2;
+                if (c.parcial3 != null) notas["Parcial 3"] = c.parcial3;
+                if (c.final != null) notas["Final"] = c.final;
+            }
+
+            let celdasNotas = "";
+            columnas.forEach(col => {
+                const notaVal = notas[col];
+                celdasNotas += `<td>${notaVal != null ? pintarNota(notaVal) : '<span class="text-muted">—</span>'}</td>`;
+            });
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${c.materiaNombre || "—"}</strong></td>
+                ${celdasNotas}
+                <td><span class="badge bg-primary">${prom ?? "—"}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ---- 2. Cargar actividades agrupadas por materia ----
+    async function cargarActividadesPorMateria(uid) {
+        const cont = document.getElementById("contenedorActividades");
+        
+        const [resE, resM] = await Promise.all([
+            listarTodasEntregasAlumno(uid),
+            listarMaterias()
+        ]);
+
+        if (!resE.ok) {
+            cont.innerHTML = `<div class="alert alert-danger">${resE.error}</div>`;
+            return;
+        }
+
+        // Solo las que ya están calificadas
+        const calificadas = resE.entregas.filter(e => e.calificacion !== null && e.calificacion !== undefined);
+
+        if (calificadas.length === 0) {
+            cont.innerHTML = '<div class="alert alert-info text-center py-4">Aún no tienes actividades calificadas.</div>';
+            return;
+        }
+
+        // Obtener el mapa de nombres de materias
+        const mapMaterias = {};
+        if (resM.ok) {
+            resM.materias.forEach(m => mapMaterias[m.id] = m.nombre);
+        }
+
+        // Agrupar las entregas por materiaId
+        const agrupadas = {};
+        calificadas.forEach(e => {
+            const mId = e.materiaId;
+            if (!agrupadas[mId]) agrupadas[mId] = [];
+            agrupadas[mId].push(e);
+        });
+
+        cont.innerHTML = "";
+
+        // Pintar una tarjeta por materia
+        for (const mId in agrupadas) {
+            const materiaNombre = agrupadas[mId][0].materiaNombre || mapMaterias[mId] || mId;
+            
+            let filasHTML = "";
+            agrupadas[mId].forEach(e => {
+                const fecha = e.fechaCalificacion ? (e.fechaCalificacion.toDate ? e.fechaCalificacion.toDate() : new Date(e.fechaCalificacion.seconds*1000)).toLocaleDateString("es-MX") : "—";
+                const tituloAct = e.actividadTitulo || "Actividad";
+                
+                filasHTML += `
+                    <tr>
+                        <td><strong>${tituloAct}</strong></td>
+                        <td><small class="text-muted">${fecha}</small></td>
+                        <td><span class="badge bg-success">${e.calificacion}</span></td>
+                    </tr>
+                `;
+            });
+
+            const card = document.createElement("div");
+            card.className = "card mb-4";
+            card.innerHTML = `
+                <div class="card-header">
+                    <i class="fas fa-book me-2"></i> ${materiaNombre}
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Actividad</th>
+                                    <th style="width:150px;">Fecha Calificada</th>
+                                    <th style="width:100px;">Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filasHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            cont.appendChild(card);
+        }
+    }
+</script>
+
+</body>
+</html>

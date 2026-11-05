@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Materias - ESCOLAR_U</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="logo">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+        <div class="header-text">
+            <h1 class="site-title">UNAM</h1>
+            <p class="site-tagline">LIANA LOPEZ PACHECO · ASIGNAR MATERIAS</p>
+        </div>
+        <div class="logo logo-right">
+            <img src="/assets/images/escudo_unam.png" alt="LOGO UNAM">
+        </div>
+    </div>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand nav-home-btn" href="dashboard-admin.html">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="btnSalir">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="row g-4">
+
+        <!-- Panel izquierdo: lista de alumnos -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-graduate me-2"></i> Alumnos
+                </div>
+                <div class="card-body p-0">
+                    <div id="listaAlumnos" style="max-height: 600px; overflow-y: auto;">
+                        <div class="text-center text-muted py-4">Cargando...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho: asignación -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span id="tituloAlumno">
+                        <i class="fas fa-book me-2"></i> Selecciona un alumno
+                    </span>
+                    <button class="btn btn-sm btn-primary" id="btnGuardar" style="display:none;">
+                        <i class="fas fa-save me-1"></i> Guardar cambios
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="mensaje" class="mb-3" style="display:none;"></div>
+
+                    <div id="panelMaterias">
+                        <p class="text-muted text-center py-5">
+                            Selecciona un alumno de la lista para asignarle materias.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer class="text-center mt-5">
+    <div class="container p-3">
+        © 2026 ESCOLAR_U - Asignar Materias
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { protegerPagina } from "../js/roles.js";
+    import { logout } from "../js/auth.js";
+    import { listarUsuarios, asignarMaterias, obtenerUsuario } from "../js/usuarios.js";
+    import { listarMaterias } from "../js/materias.js";
+
+    protegerPagina("admin", "../");
+
+    // --- Cerrar sesión ---
+    document.getElementById("btnSalir").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await logout();
+        window.location.href = "../index.html";
+    });
+
+    // --- Estado global ---
+    let alumnos = [];
+    let materias = [];
+    let alumnoActual = null;
+
+    // --- Mensajes ---
+    function mostrarMsg(texto, tipo) {
+        const msg = document.getElementById("mensaje");
+        msg.style.display = "block";
+        msg.className = tipo === "ok" ? "alert alert-success" : "alert alert-danger";
+        msg.textContent = texto;
+        setTimeout(() => { msg.style.display = "none"; }, 4000);
+    }
+
+    // --- Cargar datos iniciales ---
+    async function inicializar() {
+        const [resU, resM] = await Promise.all([listarUsuarios(), listarMaterias()]);
+
+        if (!resU.ok) {
+            document.getElementById("listaAlumnos").innerHTML =
+                `<div class="text-danger p-3">${resU.error}</div>`;
+            return;
+        }
+        if (!resM.ok) {
+            document.getElementById("panelMaterias").innerHTML =
+                `<div class="text-danger p-3">${resM.error}</div>`;
+            return;
+        }
+
+        // Solo alumnos
+        alumnos = resU.usuarios.filter((u) => u.rol === "alumno");
+        materias = resM.materias;
+
+        pintarListaAlumnos();
+    }
+
+    // --- Pintar lista de alumnos ---
+    function pintarListaAlumnos() {
+        const cont = document.getElementById("listaAlumnos");
+
+        if (alumnos.length === 0) {
+            cont.innerHTML = '<div class="text-center text-muted py-4">No hay alumnos registrados.</div>';
+            return;
+        }
+
+        cont.innerHTML = "";
+        alumnos.forEach((a) => {
+            const btn = document.createElement("button");
+            btn.className = "list-group-item list-group-item-action w-100 text-start border-0 border-bottom";
+            btn.innerHTML = `
+                <strong>${a.nombre || "Sin nombre"}</strong>
+                <br>
+                <small class="text-muted">${a.email}</small>
+                <br>
+                <span class="badge bg-info text-dark mt-1">
+                    ${(a.materiasAsignadas || []).length} materias
+                </span>
+            `;
+            btn.addEventListener("click", () => seleccionarAlumno(a.uid));
+            cont.appendChild(btn);
+        });
+    }
+
+    // --- Seleccionar alumno ---
+    async function seleccionarAlumno(uid) {
+        const res = await obtenerUsuario(uid);
+        if (!res.ok) {
+            mostrarMsg(res.error, "error");
+            return;
+        }
+        alumnoActual = res.usuario;
+        pintarPanelMaterias();
+    }
+
+    // --- Pintar panel de materias con casillas ---
+    function pintarPanelMaterias() {
+        if (!alumnoActual) return;
+
+        document.getElementById("tituloAlumno").innerHTML =
+            `<i class="fas fa-user me-2"></i> ${alumnoActual.nombre || alumnoActual.email}`;
+        document.getElementById("btnGuardar").style.display = "inline-block";
+
+        const asignadas = alumnoActual.materiasAsignadas || [];
+        const cont = document.getElementById("panelMaterias");
+
+        if (materias.length === 0) {
+            cont.innerHTML = '<p class="text-muted text-center py-5">No hay materias registradas. Ve a "Gestión de Materias" y siembra las iniciales.</p>';
+            return;
+        }
+
+        cont.innerHTML = `
+            <p class="text-muted mb-3">
+                Marca las materias que <strong>${alumnoActual.nombre || alumnoActual.email}</strong> está cursando:
+            </p>
+            <div class="row g-2" id="gridMaterias"></div>
+        `;
+
+        const grid = document.getElementById("gridMaterias");
+        materias.forEach((m) => {
+            const checked = asignadas.includes(m.id) ? "checked" : "";
+            const div = document.createElement("div");
+            div.className = "col-md-6";
+            div.innerHTML = `
+                <div class="form-check border rounded p-3 h-100">
+                    <input class="form-check-input materia-check" type="checkbox"
+                           value="${m.id}" id="chk_${m.id}" ${checked}>
+                    <label class="form-check-label w-100" for="chk_${m.id}">
+                        <strong>${m.nombre}</strong>
+                        <br>
+                        <small class="text-muted">${(m.descripcion || "").substring(0, 70)}...</small>
+                    </label>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    // --- Guardar cambios ---
+    document.getElementById("btnGuardar").addEventListener("click", async () => {
+        if (!alumnoActual) return;
+
+        const checks = document.querySelectorAll(".materia-check");
+        const seleccionadas = [];
+        checks.forEach((c) => { if (c.checked) seleccionadas.push(c.value); });
+
+        const btn = document.getElementById("btnGuardar");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+
+        const res = await asignarMaterias(alumnoActual.uid, seleccionadas);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save me-1"></i> Guardar cambios';
+
+        if (res.ok) {
+            // Actualizamos el estado local
+            alumnoActual.materiasAsignadas = seleccionadas;
+            const idx = alumnos.findIndex((a) => a.uid === alumnoActual.uid);
+            if (idx >= 0) alumnos[idx].materiasAsignadas = seleccionadas;
+            pintarListaAlumnos();
+            mostrarMsg(`✅ Se asignaron ${seleccionadas.length} materias a ${alumnoActual.nombre}.`, "ok");
+        } else {
+            mostrarMsg(res.error, "error");
+        }
+    });
+
+    // --- Inicial ---
+    inicializar();
+</script>
+
+</body>
+</html>
