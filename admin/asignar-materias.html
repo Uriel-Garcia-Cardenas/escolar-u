@@ -13,14 +13,14 @@
 <header class="site-header">
     <div class="container">
         <div class="logo">
-            <img src="../assets/images/escudo_unam.png" alt="L UNAM">
+            <img src="../assets/images/escudo_unam.png" alt="UNAM">
         </div>
         <div class="header-text">
             <h1 class="site-title">UNAM</h1>
             <p class="site-tagline">LIANA LOPEZ PACHECO · ASIGNAR MATERIAS</p>
         </div>
         <div class="logo logo-right">
-            <img src="../assets/images/escudo_unam.png" alt="L UNAM">
+            <img src="../assets/images/escudo_unam.png" alt="UNAM">
         </div>
     </div>
 </header>
@@ -55,8 +55,16 @@
                 <div class="card-header">
                     <i class="fas fa-user-graduate me-2"></i> Alumnos
                 </div>
+                <div class="card-body border-bottom pb-2">
+                    <input type="text" id="filtroAlumnoTexto" class="form-control form-control-sm mb-2"
+                           placeholder="🔍 Buscar alumno por nombre o correo...">
+                    <select id="filtroAlumnoMateria" class="form-select form-select-sm">
+                        <option value="">Todas las materias</option>
+                    </select>
+                    <small id="contadorAlumnos" class="text-muted d-block mt-2"></small>
+                </div>
                 <div class="card-body p-0">
-                    <div id="listaAlumnos" style="max-height: 600px; overflow-y: auto;">
+                    <div id="listaAlumnos" style="max-height: 500px; overflow-y: auto;">
                         <div class="text-center text-muted py-4">Cargando...</div>
                     </div>
                 </div>
@@ -116,6 +124,13 @@
     let alumnos = [];
     let materias = [];
     let alumnoActual = null;
+    let seleccionadas = new Set();   // IDs seleccionados del alumno actual (vive en memoria, no en el DOM)
+
+    // --- Normalizar (sin acentos, minúsculas) ---
+    function normalizar(txt) {
+        return (txt || "").toString().toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
     // --- Mensajes ---
     function mostrarMsg(texto, tipo) {
@@ -141,30 +156,70 @@
             return;
         }
 
-        // Solo alumnos
         alumnos = resU.usuarios.filter((u) => u.rol === "alumno");
         materias = resM.materias;
 
-        pintarListaAlumnos();
+        llenarSelectMaterias();
+        aplicarFiltroAlumnos();
     }
 
-    // --- Pintar lista de alumnos ---
-    function pintarListaAlumnos() {
+    // --- Llenar select de materias (filtro izquierdo) ---
+    function llenarSelectMaterias() {
+        const sel = document.getElementById("filtroAlumnoMateria");
+        sel.innerHTML = '<option value="">Todas las materias</option>';
+        materias.forEach((m) => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = m.nombre;
+            sel.appendChild(opt);
+        });
+    }
+
+    // --- Aplicar filtros a la lista de alumnos ---
+    function aplicarFiltroAlumnos() {
+        const texto = normalizar(document.getElementById("filtroAlumnoTexto").value.trim());
+        const materiaId = document.getElementById("filtroAlumnoMateria").value;
+
+        const filtrados = alumnos.filter((a) => {
+            if (texto) {
+                const coincide =
+                    normalizar(a.nombre).includes(texto) ||
+                    normalizar(a.email).includes(texto);
+                if (!coincide) return false;
+            }
+            if (materiaId) {
+                const asignadas = a.materiasAsignadas || [];
+                if (!asignadas.includes(materiaId)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById("contadorAlumnos").textContent =
+            `Mostrando ${filtrados.length} de ${alumnos.length} alumnos`;
+
+        pintarListaAlumnos(filtrados);
+    }
+
+    // --- Pintar lista de alumnos (ya filtrada) ---
+    function pintarListaAlumnos(lista) {
         const cont = document.getElementById("listaAlumnos");
 
-        if (alumnos.length === 0) {
-            cont.innerHTML = '<div class="text-center text-muted py-4">No hay alumnos registrados.</div>';
+        if (lista.length === 0) {
+            cont.innerHTML = '<div class="text-center text-muted py-4">No hay alumnos que coincidan con los filtros.</div>';
             return;
         }
 
         cont.innerHTML = "";
-        alumnos.forEach((a) => {
+        lista.forEach((a) => {
             const btn = document.createElement("button");
             btn.className = "list-group-item list-group-item-action w-100 text-start border-0 border-bottom";
+            const esActivo = alumnoActual && alumnoActual.uid === a.uid;
+            if (esActivo) btn.classList.add("active");
+
             btn.innerHTML = `
                 <strong>${a.nombre || "Sin nombre"}</strong>
                 <br>
-                <small class="text-muted">${a.email}</small>
+                <small class="${esActivo ? "" : "text-muted"}">${a.email}</small>
                 <br>
                 <span class="badge bg-info text-dark mt-1">
                     ${(a.materiasAsignadas || []).length} materias
@@ -183,10 +238,17 @@
             return;
         }
         alumnoActual = res.usuario;
+        // Cargar el set en memoria con lo que ya tiene asignado en Firestore
+        seleccionadas = new Set(alumnoActual.materiasAsignadas || []);
+
+        // Re-renderizar lista para resaltar el activo
+        aplicarFiltroAlumnos();
+
+        // Redibujar panel derecho (esto también reinicia sus filtros, intencional al cambiar de alumno)
         pintarPanelMaterias();
     }
 
-    // --- Pintar panel de materias con casillas ---
+    // --- Pintar panel de materias (una sola vez por alumno) ---
     function pintarPanelMaterias() {
         if (!alumnoActual) return;
 
@@ -194,7 +256,6 @@
             `<i class="fas fa-user me-2"></i> ${alumnoActual.nombre || alumnoActual.email}`;
         document.getElementById("btnGuardar").style.display = "inline-block";
 
-        const asignadas = alumnoActual.materiasAsignadas || [];
         const cont = document.getElementById("panelMaterias");
 
         if (materias.length === 0) {
@@ -203,15 +264,64 @@
         }
 
         cont.innerHTML = `
-            <p class="text-muted mb-3">
+            <p class="text-muted mb-2">
                 Marca las materias que <strong>${alumnoActual.nombre || alumnoActual.email}</strong> está cursando:
             </p>
+            <div class="row g-2 mb-2">
+                <div class="col-md-7">
+                    <input type="text" id="filtroMateriaTexto" class="form-control form-control-sm"
+                           placeholder="🔍 Buscar materia por nombre o descripción...">
+                </div>
+                <div class="col-md-5 d-flex align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="filtroSoloAsignadas">
+                        <label class="form-check-label" for="filtroSoloAsignadas">
+                            Solo asignadas
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <small id="contadorMaterias" class="text-muted d-block mb-2"></small>
             <div class="row g-2" id="gridMaterias"></div>
         `;
 
+        document.getElementById("filtroMateriaTexto")
+            .addEventListener("input", aplicarFiltroMaterias);
+        document.getElementById("filtroSoloAsignadas")
+            .addEventListener("change", aplicarFiltroMaterias);
+
+        aplicarFiltroMaterias();
+    }
+
+    // --- Aplicar filtros a la cuadrícula de materias ---
+    function aplicarFiltroMaterias() {
+        const texto = normalizar(document.getElementById("filtroMateriaTexto").value.trim());
+        const soloAsignadas = document.getElementById("filtroSoloAsignadas").checked;
+
+        const filtradas = materias.filter((m) => {
+            if (texto) {
+                const coincide =
+                    normalizar(m.nombre).includes(texto) ||
+                    normalizar(m.descripcion).includes(texto);
+                if (!coincide) return false;
+            }
+            if (soloAsignadas && !seleccionadas.has(m.id)) return false;
+            return true;
+        });
+
+        document.getElementById("contadorMaterias").textContent =
+            `Mostrando ${filtradas.length} de ${materias.length} materias · ${seleccionadas.size} seleccionadas`;
+
         const grid = document.getElementById("gridMaterias");
-        materias.forEach((m) => {
-            const checked = asignadas.includes(m.id) ? "checked" : "";
+        grid.innerHTML = "";
+
+        if (filtradas.length === 0) {
+            grid.innerHTML = '<div class="col-12 text-center text-muted py-4">No hay materias que coincidan con los filtros.</div>';
+            return;
+        }
+
+        filtradas.forEach((m) => {
+            const checked = seleccionadas.has(m.id) ? "checked" : "";
             const div = document.createElement("div");
             div.className = "col-md-6";
             div.innerHTML = `
@@ -227,36 +337,50 @@
             `;
             grid.appendChild(div);
         });
+
+        // Listener: actualiza el Set en memoria (NO re-filtra, para no perder lo que el usuario está viendo)
+        grid.querySelectorAll(".materia-check").forEach((chk) => {
+            chk.addEventListener("change", () => {
+                if (chk.checked) seleccionadas.add(chk.value);
+                else seleccionadas.delete(chk.value);
+
+                document.getElementById("contadorMaterias").textContent =
+                    `Mostrando ${filtradas.length} de ${materias.length} materias · ${seleccionadas.size} seleccionadas`;
+            });
+        });
     }
 
     // --- Guardar cambios ---
     document.getElementById("btnGuardar").addEventListener("click", async () => {
         if (!alumnoActual) return;
 
-        const checks = document.querySelectorAll(".materia-check");
-        const seleccionadas = [];
-        checks.forEach((c) => { if (c.checked) seleccionadas.push(c.value); });
+        const arreglo = Array.from(seleccionadas);
 
         const btn = document.getElementById("btnGuardar");
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
 
-        const res = await asignarMaterias(alumnoActual.uid, seleccionadas);
+        const res = await asignarMaterias(alumnoActual.uid, arreglo);
 
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save me-1"></i> Guardar cambios';
 
         if (res.ok) {
-            // Actualizamos el estado local
-            alumnoActual.materiasAsignadas = seleccionadas;
+            alumnoActual.materiasAsignadas = arreglo;
             const idx = alumnos.findIndex((a) => a.uid === alumnoActual.uid);
-            if (idx >= 0) alumnos[idx].materiasAsignadas = seleccionadas;
-            pintarListaAlumnos();
-            mostrarMsg(`✅ Se asignaron ${seleccionadas.length} materias a ${alumnoActual.nombre}.`, "ok");
+            if (idx >= 0) alumnos[idx].materiasAsignadas = arreglo;
+
+            aplicarFiltroAlumnos();      // refresca el badge "X materias" en la lista izquierda
+            aplicarFiltroMaterias();     // refresca el contador del panel derecho
+            mostrarMsg(`✅ Se asignaron ${arreglo.length} materias a ${alumnoActual.nombre || alumnoActual.email}.`, "ok");
         } else {
             mostrarMsg(res.error, "error");
         }
     });
+
+    // --- Listeners de filtros del panel izquierdo ---
+    document.getElementById("filtroAlumnoTexto").addEventListener("input", aplicarFiltroAlumnos);
+    document.getElementById("filtroAlumnoMateria").addEventListener("change", aplicarFiltroAlumnos);
 
     // --- Inicial ---
     inicializar();

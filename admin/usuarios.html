@@ -96,6 +96,39 @@
                 <i class="fas fa-sync-alt"></i> Refrescar
             </button>
         </div>
+
+        <!-- ====== FILTROS (NUEVO) ====== -->
+        <div class="card-body border-bottom">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" id="filtroTexto" class="form-control form-control-sm"
+                           placeholder="🔍 Buscar por nombre o correo...">
+                </div>
+                <div class="col-md-3">
+                    <select id="filtroRol" class="form-select form-select-sm">
+                        <option value="">Todos los roles</option>
+                        <option value="admin">admin</option>
+                        <option value="supervisor">supervisor</option>
+                        <option value="alumno">alumno</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filtroEstado" class="form-select form-select-sm">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button id="btnLimpiarFiltros" class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+            <small id="contadorResultados" class="text-muted d-block mt-2"></small>
+        </div>
+        <!-- ============================= -->
+
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
@@ -133,10 +166,14 @@
         listarUsuarios,
         actualizarRol,
         cambiarActivo,
-        borrarUsuarioDoc
+        borrarUsuarioDoc,
+        enviarResetPassword
     } from "../js/usuarios.js";
 
     protegerPagina("admin", "../");
+
+    // ====== ESTADO ======
+    let todosLosUsuarios = [];   // lista completa desde Firestore
 
     // --- Cerrar sesión ---
     document.getElementById("btnSalir").addEventListener("click", async (e) => {
@@ -183,7 +220,38 @@
         }
     });
 
-    // --- Cargar usuarios ---
+    // ====== NORMALIZAR TEXTO (sin acentos, minúsculas) ======
+    function normalizar(txt) {
+        return (txt || "").toString().toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // ====== FILTRAR ======
+    function aplicarFiltros() {
+        const texto  = normalizar(document.getElementById("filtroTexto").value.trim());
+        const rol    = document.getElementById("filtroRol").value;
+        const estado = document.getElementById("filtroEstado").value;
+
+        const filtrados = todosLosUsuarios.filter((u) => {
+            if (texto) {
+                const coincide =
+                    normalizar(u.nombre).includes(texto) ||
+                    normalizar(u.email).includes(texto);
+                if (!coincide) return false;
+            }
+            if (rol && u.rol !== rol) return false;
+            if (estado === "activo"   && !u.activo) return false;
+            if (estado === "inactivo" &&  u.activo) return false;
+            return true;
+        });
+
+        document.getElementById("contadorResultados").textContent =
+            `Mostrando ${filtrados.length} de ${todosLosUsuarios.length} usuarios`;
+
+        renderizarTabla(filtrados);
+    }
+
+    // ====== CARGAR DESDE FIRESTORE ======
     async function cargarUsuarios() {
         const tbody = document.getElementById("tablaUsuarios");
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Cargando...</td></tr>';
@@ -195,13 +263,21 @@
             return;
         }
 
-        if (res.usuarios.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No hay usuarios registrados.</td></tr>';
+        todosLosUsuarios = res.usuarios;
+        aplicarFiltros();
+    }
+
+    // ====== RENDER DE LA TABLA ======
+    function renderizarTabla(usuarios) {
+        const tbody = document.getElementById("tablaUsuarios");
+
+        if (usuarios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No hay usuarios que coincidan con los filtros.</td></tr>';
             return;
         }
 
         tbody.innerHTML = "";
-        res.usuarios.forEach((u) => {
+        usuarios.forEach((u) => {
             const fila = document.createElement("tr");
             fila.innerHTML = `
                 <td>${u.nombre || "—"}</td>
@@ -218,69 +294,93 @@
                         <input class="form-check-input activo-switch" type="checkbox" data-uid="${u.uid}" ${u.activo ? "checked" : ""}>
                     </div>
                 </td>
-                  <td>
-    <button class="btn btn-sm btn-outline-warning btn-reset me-1" data-email="${u.email}" title="Enviar correo de restablecimiento de contraseña">
-        <i class="fas fa-key"></i>
-    </button>
-    <button class="btn btn-sm btn-outline-danger btn-borrar" data-uid="${u.uid}">
-        <i class="fas fa-trash"></i>
-    </button>
-</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-warning btn-reset me-1" data-email="${u.email}" title="Enviar correo de restablecimiento de contraseña">
+                        <i class="fas fa-key"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger btn-borrar" data-uid="${u.uid}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             `;
             tbody.appendChild(fila);
         });
 
-        // Listeners de la tabla
+        // --- Listener: cambiar rol ---
         tbody.querySelectorAll(".rol-select").forEach((sel) => {
             sel.addEventListener("change", async () => {
                 const uid = sel.dataset.uid;
                 const nuevoRol = sel.value;
                 const r = await actualizarRol(uid, nuevoRol);
-                if (!r.ok) alert(r.error);
+                if (!r.ok) { alert(r.error); return; }
+
+                // actualizar objeto local y re-filtrar
+                const u = todosLosUsuarios.find((x) => x.uid === uid);
+                if (u) u.rol = nuevoRol;
+                aplicarFiltros();
             });
         });
 
+        // --- Listener: activar / desactivar ---
         tbody.querySelectorAll(".activo-switch").forEach((chk) => {
             chk.addEventListener("change", async () => {
                 const uid = chk.dataset.uid;
                 const activo = chk.checked;
                 const r = await cambiarActivo(uid, activo);
-                if (!r.ok) alert(r.error);
+                if (!r.ok) { alert(r.error); return; }
+
+                const u = todosLosUsuarios.find((x) => x.uid === uid);
+                if (u) u.activo = activo;
+                aplicarFiltros();
             });
         });
 
+        // --- Listener: borrar ---
         tbody.querySelectorAll(".btn-borrar").forEach((btn) => {
             btn.addEventListener("click", async () => {
                 if (!confirm("¿Borrar este usuario de Firestore? (No se borra de Auth)")) return;
                 const uid = btn.dataset.uid;
                 const r = await borrarUsuarioDoc(uid);
-                if (r.ok) cargarUsuarios();
-                else alert(r.error);
+                if (r.ok) {
+                    todosLosUsuarios = todosLosUsuarios.filter((x) => x.uid !== uid);
+                    aplicarFiltros();
+                } else {
+                    alert(r.error);
+                }
             });
         });
 
+        // --- Listener: enviar reset ---
         tbody.querySelectorAll(".btn-reset").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-        const email = btn.dataset.email;
-        if (!confirm(`¿Enviar correo de restablecimiento de contraseña a ${email}?`)) return;
+            btn.addEventListener("click", async () => {
+                const email = btn.dataset.email;
+                if (!confirm(`¿Enviar correo de restablecimiento de contraseña a ${email}?`)) return;
 
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-        const { enviarResetPassword } = await import("../js/usuarios.js");
-        const r = await enviarResetPassword(email);
+                const r = await enviarResetPassword(email);
 
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-key"></i>';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i>';
 
-        if (r.ok) {
-            alert(`✅ ${r.mensaje}`);
-        } else {
-            alert(`❌ ${r.error}`);
-        }
-    });
-});
+                if (r.ok) alert(`✅ ${r.mensaje}`);
+                else alert(`❌ ${r.error}`);
+            });
+        });
     }
+
+    // ====== LISTENERS DE FILTROS ======
+    document.getElementById("filtroTexto").addEventListener("input", aplicarFiltros);
+    document.getElementById("filtroRol").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroEstado").addEventListener("change", aplicarFiltros);
+
+    document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
+        document.getElementById("filtroTexto").value = "";
+        document.getElementById("filtroRol").value = "";
+        document.getElementById("filtroEstado").value = "";
+        aplicarFiltros();
+    });
 
     document.getElementById("btnRefrescar").addEventListener("click", cargarUsuarios);
 
